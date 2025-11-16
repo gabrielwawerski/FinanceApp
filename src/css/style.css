@@ -1,0 +1,34 @@
+:root {
+  /* Layout */
+  --container-max-width: 800px;
+  --transition: all 0.2s ease;
+
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+
+  /* Light theme */
+  --bg: #fff;
+  --text: #363636;
+  --muted: #777;
+  --border: #e0e0e0;
+  --success: #2ecc71;
+  --danger: #e74c3c;
+  --primary: #3498db;
+
+  /* Dark theme */
+  --dark-bg: #1e1e1e;
+  --dark-text: #f5f5f5;
+  --dark-muted: #aaa;
+  --dark-border: #444;
+}
+
+[data-theme="dark"] {
+  --bg: var(--dark-bg);
+  --text: var(--dark-text);
+  --muted: var(--dark-muted);
+  --border: var(--dark-border);
+}

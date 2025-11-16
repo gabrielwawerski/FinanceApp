@@ -1,0 +1,19 @@
+<div class="container is-fullheight has-text-centered" x-data>
+  <div class="notification is-warning">
+    <h1 class="title">Page Not Found</h1>
+    <p class="subtitle">The page you're looking for doesn't exist or has been moved.</p>
+    <div class="buttons is-centered mt-4">
+      <button class="button is-primary" @click="$store.app.navigateTo('landing')">
+        <span class="icon"><i class="fas fa-home"></i></span>
+        <span>Go Home</span>
+      </button>
+      <button class="button is-info" @click="window.history.back()">
+        <span class="icon"><i class="fas fa-arrow-left"></i></span>
+        <span>Go Back</span>
+      </button>
+    </div>
+    <div class="mt-4">
+      <p class="has-text-grey">Error code: PAGE_NOT_FOUND</p>
+    </div>
+  </div>
+</div>

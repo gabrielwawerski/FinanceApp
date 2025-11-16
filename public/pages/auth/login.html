@@ -1,0 +1,48 @@
+<div x-data="loginModal()"
+     x-show="$store.app.showLoginModal"
+     x-trap.noscroll="$store.app.showLoginModal"
+     id="login-modal"
+     class="modal is-active"
+     :class="{ 'is-active': $store.app.showLoginModal}">
+
+  <div class="modal-background" @click="closeModal()"></div>
+  <div id="login-modal-body" class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Login</p>
+      <button class="delete" @click="closeModal()" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body" @click.outside="closeModal()">
+      <!-- Login form -->
+      <form @submit.prevent="">
+        <div class="field">
+          <label for="login-username-input" class="label">Username</label>
+          <div class="control">
+            <label>
+              <input id="login-username-input"
+                     class="input"
+                     type="text"
+                     x-model="username"
+                     placeholder="Your username">
+            </label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="login-password-input" class="label">Password</label>
+          <div class="control">
+            <input id="login-password-input"
+                   class="input"
+                   type="password"
+                   x-model="password"
+                   placeholder="Your password">
+          </div>
+        </div>
+      </form>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-success"
+              @click="$store.app.login()">Login
+      </button>
+      <button class="button" @click="$store.app.goToRegister()">Register instead</button>
+    </footer>
+  </div>
+</div>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" x-data :data-theme="$store.app.isDarkTheme ? 'dark' : 'light'">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Manager</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/node_modules/bulma/css/bulma.css">
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"/>
+  <link rel="stylesheet" href="/src/css/style.css">
+  <script type="module" src="/src/main.js"></script>
+</head>
+<body style="overflow: hidden;max-height: 100vh;">
+<!-- Navigation -->
+<nav class="navbar is-transparent" role="navigation" aria-label="main navigation" x-data="{ open: false }">
+  <div class="container">
+    <div class="navbar-brand">
+      <a class="navbar-item has-text-weight-semibold"
+         @click="open = false;$store.app.goToLanding()">
+        Finance Manager
+      </a>
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
+         :class="{ 'is-active': open }"
+         @click="open = !open">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div id="main-navbar" class="navbar-menu" :class="{ 'is-active': open }">
+      <div class="navbar-start"></div>
+
+      <div class="navbar-end" style="gap:0.5rem;">
+        <template x-if="$store.app.currentUser">
+          <theme-toggle></theme-toggle>
+          <a class="navbar-item" @click="open = false;$store.app.logout();" title="Logout">
+            <i class="fas fa-sign-out-alt"></i>
+          </a>
+        </template>
+
+        <template x-if="!$store.app.currentUser">
+          <div class="navbar-item">
+            <div class="buttons">
+              <theme-toggle></theme-toggle>
+              <button class="button is-light" @click="$store.app.goToLogin()">Login</button>
+              <button class="button is-primary" @click="$store.app.goToRegister()">Register</button>
+              <button class="button is-primary" @click="$store.app.goToDashboard()">Dashboard</button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Main content container -->
+<div id="main-content"></div>
+
+<!-- Auth modal container -->
+<div id="modal-content"></div>
+
+</body>
+</html>
