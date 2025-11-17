@@ -10,28 +10,29 @@ export const PAGES = Object.freeze({
 export const MAIN_CONTAINER_ID = 'main-content';
 export const MODAL_CONTAINER_ID = 'modal-content';
 
-// Route definitions with only static data
+const BASE = import.meta.env.BASE_URL;
+
 export const ROUTE_CONFIGS = Object.freeze({
-  [PAGES.LOGIN]: {
-	url: '/views/auth/login.html',
-	target: `#${MODAL_CONTAINER_ID}`
-  },
-  [PAGES.REGISTER]: {
-	url: '/views/auth/register.html',
-	target: `#${MODAL_CONTAINER_ID}`,
-  },
-  [PAGES.DASHBOARD]: {
-	url: '/views/dashboard/dashboard.html',
-	target: `#${MAIN_CONTAINER_ID}`,
-  },
-  [PAGES.LANDING]: {
-	url: '/views/landing.html',
-	target: `#${MAIN_CONTAINER_ID}`,
-  },
-  error: {
-	url: '/views/404.html',
-	target: `#${MAIN_CONTAINER_ID}`,
-  }
+	[PAGES.LOGIN]: {
+		url: `${BASE}views/auth/login.html`,
+		target: `#${MODAL_CONTAINER_ID}`
+	},
+	[PAGES.REGISTER]: {
+		url: `${BASE}views/auth/register.html`,
+		target: `#${MODAL_CONTAINER_ID}`,
+	},
+	[PAGES.DASHBOARD]: {
+		url: `${BASE}views/dashboard/dashboard.html`,
+		target: `#${MAIN_CONTAINER_ID}`,
+	},
+	[PAGES.LANDING]: {
+		url: `${BASE}views/landing.html`,
+		target: `#${MAIN_CONTAINER_ID}`,
+	},
+	error: {
+		url: `${BASE}views/404.html`,
+		target: `#${MAIN_CONTAINER_ID}`,
+	}
 });
 
 export const RESTRICTED_PAGES = [PAGES.LOGIN, PAGES.REGISTER, 'error'];
