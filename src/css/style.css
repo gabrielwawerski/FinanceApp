@@ -46,4 +46,37 @@
 body {
   overflow: hidden;
   max-height: 100vh;
+  user-select: none;
+}
+
+/* style.css */
+
+#main-content > * {
+  transition: opacity 0.1s ease;
+}
+
+.fade-in {
+  opacity: 0;
+  /*transform: translateY(10px);*/
+  animation: fadeIn 0.2s forwards;
+}
+
+.fade-out {
+  opacity: 1;
+  /*transform: translateY(0);*/
+  animation: fadeOut 0.2s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    /*transform: translateY(0);*/
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    /*transform: translateY(-10px);*/
+  }
 }

@@ -60,3 +60,18 @@ export function throttle(fn, limit) {
 export function clearById(element) {
   document.getElementById(element).innerHTML = '';
 }
+
+// htmx-ext-alpine-morph inlined to use in es6 modules
+// htmx.defineExtension('alpine-morph', {
+//   onEvent: function(name, evt) {
+//     if (name === 'htmx:swap') {
+//       // Tell htmx to use morph instead of default swap
+//       if (Alpine && Alpine.morph) {
+//         evt.detail.shouldMorph = true;
+//         evt.detail.swap = function(target, fragment) {
+//           Alpine.morph(target, fragment);
+//         };
+//       }
+//     }
+//   }
+// });

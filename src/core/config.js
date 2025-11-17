@@ -5,6 +5,7 @@ export const PAGES = Object.freeze({
   REGISTER: 'register',
   DASHBOARD: 'dashboard',
   SETTINGS: 'settings',
+  TEST: 'test'
 });
 
 export const MAIN_CONTAINER_ID = 'main-content';
@@ -29,6 +30,12 @@ export const ROUTE_CONFIGS = Object.freeze({
 		url: `${BASE}views/landing.html`,
 		target: `#${MAIN_CONTAINER_ID}`,
 	},
+
+  	[PAGES.TEST]: {
+		url: `${BASE}views/test.html`,
+		target: `#${MAIN_CONTAINER_ID}`,
+	},
+
 	error: {
 		url: `${BASE}views/404.html`,
 		target: `#${MAIN_CONTAINER_ID}`,

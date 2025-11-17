@@ -1,9 +1,7 @@
 import htmx from 'htmx.org';
-import { getCurrentUser } from "@util/auth-util.js";
 import { clearById, safePersist, throttle } from "@util/util.js";
 import {
-  AUTH_LOGIN_EVENT, AUTH_LOGOUT_EVENT, LS_CURRENT_USER, MAIN_CONTAINER_ID, MODAL_CONTAINER_ID, PAGES, RESTRICTED_PAGES,
-  ROUTE_CONFIGS
+  AUTH_LOGIN_EVENT, AUTH_LOGOUT_EVENT, MAIN_CONTAINER_ID, MODAL_CONTAINER_ID, PAGES, RESTRICTED_PAGES, ROUTE_CONFIGS
 } from "@core/config.js";
 import { events } from "@core/events.js";
 
@@ -32,12 +30,12 @@ import { events } from "@core/events.js";
  */
 export const AppStore = (Alpine) => {
   Alpine.store('app', {
-	currentUser: getCurrentUser(),
-	currentPage: '', // TODO: save to local storage later, remove when auth cookie gets removed/logout
+	currentUser: null,
+	lastPage: null,
+	currentPage: '',
 	isMobile: safePersist('app.isMobile', false),
 	isDarkTheme: safePersist('app.isDarkTheme', true),
 	showLoginModal: false,
-	// get currentPage() { return this.currentUser ? 'dashboard' : 'index'; },
 
 	/**
 	 * Initializes the app store state and behavior:
@@ -52,70 +50,68 @@ export const AppStore = (Alpine) => {
 	  if (this.currentUser) {
 		this.navigateTo(PAGES.DASHBOARD);
 	  } else {
-		this.navigateTo(PAGES.LANDING);
+		this.navigateTo(PAGES.LANDING, {updateHistory: false});
 	  }
 
+	  // Window resize tracking
 	  const handleResize = () => {
 		this.setMobile(window.innerWidth <= 768);
-		console.log("resized!")
 	  };
 
 	  window.addEventListener('resize', throttle(() => handleResize(), 250));
 	  handleResize();
 	},
 
-	navigateTo(page, {updateHistory = true} = {}) {
+
+	/* ============================
+	   Navigation
+	============================= */
+	async navigateTo(page, {updateHistory = true} = {}) {
+	  if (this.currentPage === page) return;
 	  const AUTH_REQUIRED_PAGES = [PAGES.DASHBOARD];
 	  const AUTH_RESTRICTED_PAGES = [PAGES.LOGIN, PAGES.REGISTER, PAGES.LANDING];
 
+	  // Guards
 	  if (AUTH_RESTRICTED_PAGES.includes(page) && this.currentUser) {
-		console.log(`Access to ${page} denied: User already authenticated`);
 		this.goToDashboard();
 		return;
 	  }
 
-	  // Authentication guard
 	  if (AUTH_REQUIRED_PAGES.includes(page) && !this.currentUser) {
-		console.log(`Access to ${page} denied: User not authenticated`);
+		console.warn(`Access to ${page} denied: unauthenticated`);
 		return;
 	  }
 
 	  const route = ROUTE_CONFIGS[page];
 	  if (!route) {
-		console.error(`Unknown page: ${page}`);
 		this.showErrorPage('404 - Page not found');
 		return;
 	  }
 
+	  this.lastPage = this.currentPage;
 	  this.currentPage = page;
 
 	  // Push state to history for back/forward navigation
 	  if (updateHistory) {
 		if (RESTRICTED_PAGES.includes(page)) {
-		  history.replaceState({page}, '', ''); // replace instead of push
+		  history.replaceState({page}, '', '');
 		} else {
 		  history.pushState({page}, '', '');
 		}
 	  }
 
-	  // Handle callbacks based on page
+	  // Auth mode feeling
 	  switch (page) {
 		case PAGES.LOGIN:
-		  console.log("login")
 		  this.authMode = 'login';
 		  break;
 		case PAGES.REGISTER:
 		  this.authMode = 'register';
 		  break;
-		case PAGES.DASHBOARD:
-		case PAGES.LANDING:
-		  break;
-		case 'error':
-		  break;
 	  }
 
-	  // Make the request with comprehensive error handling
-	  htmx.ajax('GET', route.url, {
+	  // htmx load
+	  await htmx.ajax('get', route.url, {
 		target: route.target,
 		swap: 'innerHTML',
 		headers: {
@@ -135,12 +131,10 @@ export const AppStore = (Alpine) => {
 	},
 
 	goToLanding() {
-	  console.log("landing");
 	  this.navigateTo(PAGES.LANDING);
 	},
 
 	goToDashboard() {
-	  console.log("dashboard");
 	  this.navigateTo(PAGES.DASHBOARD);
 	},
 
@@ -155,6 +149,7 @@ export const AppStore = (Alpine) => {
 	login(userData) {
 	  localStorage.setItem(LS_CURRENT_USER, JSON.stringify(userData));
 	  this.currentUser = userData;
+
 	  events.emit(AUTH_LOGIN_EVENT, {user: userData});
 	},
 
@@ -162,23 +157,30 @@ export const AppStore = (Alpine) => {
 	  localStorage.removeItem(LS_CURRENT_USER);
 	  this.currentUser = null;
 	  events.emit(AUTH_LOGOUT_EVENT);
+	  await this.navigateTo(PAGES.LANDING);
 	},
 
+
+	/* ============================
+	   Utility
+	============================= */
 	closeModal() {
 	  this.showLoginModal = false;
+	  this.currentPage = this.lastPage ?? PAGES.DASHBOARD;
 	  requestAnimationFrame(() => {
 		clearById(MODAL_CONTAINER_ID);
 	  });
 	},
 
 	showErrorPage(message = 'Page not found', error = null) {
-	  this.authModalOpen = false;
-	  const target = MAIN_CONTAINER_ID;
+	  if (error) {
+		console.error('Navigation error:', error);
+	  }
 
 	  if (error) { console.error('Navigation error:', error); }
 	  // Load the 404 page
 	  htmx.ajax('GET', '/404.html', {
-		target: target,
+		target: MAIN_CONTAINER_ID,
 		swap: 'innerHTML',
 		headers: {
 		  'HX-Request': 'true'
@@ -190,6 +192,6 @@ export const AppStore = (Alpine) => {
 
 	toggleTheme() {
 	  this.isDarkTheme = !this.isDarkTheme;
-	},
+	}
   });
 };

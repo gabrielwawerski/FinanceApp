@@ -1,4 +1,4 @@
-<div class="hero is-fullheight-with-navbar" x-data>
+<div id="landing-partial" class="hero is-fullheight-with-navbar" x-data>
   <div class="hero-body">
     <div class="container has-text-centered">
       <h1 class="title">Finance Manager</h1>
@@ -11,7 +11,8 @@
         ></button>
         <button @click="$store.app.goToRegister()"
                 x-text="$store.locale.tr(TR_KEYS.REGISTER)"
-                class="button is-light">Register</button>
+                class="button is-light">Register
+        </button>
       </div>
     </div>
   </div>

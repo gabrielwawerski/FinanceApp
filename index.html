@@ -29,6 +29,9 @@
       </a>
       <a class="navbar-item has-text-weight-semibold" @click="await $store.locale.set('pl')">PL</a>
       <a class="navbar-item has-text-weight-semibold" @click="await $store.locale.set('en')">EN</a>
+      <a @click="$store.app.navigateTo('test')"
+              class="navbar-item">Test Page
+      </a>
       <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
          :class="{ 'is-active': open }"
          @click="open = !open">
@@ -68,6 +71,7 @@
     </div>
   </div>
 </nav>
+
 <!-- Main content container -->
 <div id="main-content"></div>
 
