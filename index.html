@@ -16,15 +16,19 @@
   <link rel="stylesheet" href="/src/css/style.css">
   <script type="module" src="/src/main.js"></script>
 </head>
-<body style="overflow: hidden;max-height: 100vh;">
+<body>
 <!-- Navigation -->
 <nav class="navbar is-transparent" role="navigation" aria-label="main navigation" x-data="{ open: false }">
   <div class="container">
     <div class="navbar-brand">
-      <a class="navbar-item has-text-weight-semibold"
-         @click="open = false;$store.app.goToLanding()">
-        Finance Manager
+      <a
+         class="navbar-item has-text-weight-semibold"
+         @click="open = false; $store.app.handleLogoClick()"
+      >
+        <span x-text="$store.app.currentUser ? $store.locale.tr(TR_KEYS.DASHBOARD) : $store.locale.tr(TR_KEYS.APP_NAME)"></span>
       </a>
+      <a class="navbar-item has-text-weight-semibold" @click="await $store.locale.set('pl')">PL</a>
+      <a class="navbar-item has-text-weight-semibold" @click="await $store.locale.set('en')">EN</a>
       <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
          :class="{ 'is-active': open }"
          @click="open = !open">
@@ -50,9 +54,13 @@
           <div class="navbar-item">
             <div class="buttons">
               <theme-toggle></theme-toggle>
-              <button class="button is-light" @click="$store.app.goToLogin()">Login</button>
-              <button class="button is-primary" @click="$store.app.goToRegister()">Register</button>
-              <button class="button is-primary" @click="$store.app.goToDashboard()">Dashboard</button>
+              <button @click="$store.app.goToLogin()"
+                      x-text="$store.locale.tr(TR_KEYS.LOGIN)"
+                      class="button is-light"></button>
+              <button @click="$store.app.goToDashboard()"
+                      x-text="$store.locale.tr(TR_KEYS.REGISTER)"
+                      class="button is-primary">
+              </button>
             </div>
           </div>
         </template>
@@ -60,12 +68,10 @@
     </div>
   </div>
 </nav>
-
 <!-- Main content container -->
 <div id="main-content"></div>
 
 <!-- Auth modal container -->
 <div id="modal-content"></div>
-
 </body>
 </html>

@@ -1,0 +1,13 @@
+{
+  "lang_key": "pl",
+  "lang_name": "Polski",
+  "app_name": "Finance Manager",
+
+  "login": "Zaloguj",
+  "logout": "Wyloguj",
+  "register": "Zarejestruj się",
+  "settings": "Ustawienia",
+  "dashboard": "Przegląd",
+
+  "landing_subtitle": "Łatwe śledzenie Twoich finansów"
+}

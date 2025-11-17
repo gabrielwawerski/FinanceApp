@@ -2,16 +2,13 @@ const CACHE_NAME = 'finance-manager-v1';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/main.js',
-  '/styles.css',
-  '/pages/landing.html',
-  '/pages/auth/login.html',
-  '/pages/auth/register.html',
-  '/pages/dashboard/dashboard.html',
+  '/src/main.js',
+  '/src/css/styles.css',
+  '/views/landing.html',
+  '/views/auth/login.html',
+  '/views/auth/register.html',
+  '/views/dashboard/dashboard.html',
   '/manifest.json',
-  'https://unpkg.com/htmx.org@1.9.6',
-  'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js',
-  'https://cdn.jsdelivr.net/npm/@alpinejs/morph@3.x.x/dist/cdn.min.js'
 ];
 
 // Install event - cache files

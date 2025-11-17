@@ -1,6 +1,6 @@
 import htmx from 'htmx.org';
-import { getCurrentUser } from "@util/authUtil.js";
-import { clearById, persist, throttle } from "@util/util.js";
+import { getCurrentUser } from "@util/auth-util.js";
+import { clearById, safePersist, throttle } from "@util/util.js";
 import {
   AUTH_LOGIN_EVENT, AUTH_LOGOUT_EVENT, LS_CURRENT_USER, MAIN_CONTAINER_ID, MODAL_CONTAINER_ID, PAGES, RESTRICTED_PAGES,
   ROUTE_CONFIGS
@@ -30,12 +30,12 @@ import { events } from "@core/events.js";
  *
  * @namespace App
  */
-export const appStore = (Alpine) => {
+export const AppStore = (Alpine) => {
   Alpine.store('app', {
 	currentUser: getCurrentUser(),
-	currentPage: '',
-	isMobile: persist(false, 'app.isMobile'),
-	isDarkTheme: persist(true, 'app.isDarkTheme'),
+	currentPage: '', // TODO: save to local storage later, remove when auth cookie gets removed/logout
+	isMobile: safePersist('app.isMobile', false),
+	isDarkTheme: safePersist('app.isDarkTheme', true),
 	showLoginModal: false,
 	// get currentPage() { return this.currentUser ? 'dashboard' : 'index'; },
 
@@ -135,11 +135,21 @@ export const appStore = (Alpine) => {
 	},
 
 	goToLanding() {
+	  console.log("landing");
 	  this.navigateTo(PAGES.LANDING);
 	},
 
 	goToDashboard() {
+	  console.log("dashboard");
 	  this.navigateTo(PAGES.DASHBOARD);
+	},
+
+	handleLogoClick() {
+	  if (this.currentUser) {
+		this.goToDashboard();
+	  } else {
+		this.goToLanding();
+	  }
 	},
 
 	login(userData) {

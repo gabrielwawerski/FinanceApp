@@ -1,28 +1,35 @@
-<div x-data="loginModal()"
+<div x-data="LoginModal()"
+     x-init="$nextTick(() => {$refs.usernameInput.focus()})"
      x-show="$store.app.showLoginModal"
      x-trap.noscroll="$store.app.showLoginModal"
+     :class="{ 'is-active': $store.app.showLoginModal}"
      id="login-modal"
-     class="modal is-active"
-     :class="{ 'is-active': $store.app.showLoginModal}">
+     class="modal is-active">
 
-  <div class="modal-background" @click="closeModal()"></div>
+  <div @click="closeModal()"
+       class="modal-background"></div>
   <div id="login-modal-body" class="modal-card">
     <header class="modal-card-head">
       <p class="modal-card-title">Login</p>
-      <button class="delete" @click="closeModal()" aria-label="close"></button>
+      <button @click="closeModal()"
+              class="delete"
+              aria-label="close"></button>
     </header>
-    <section class="modal-card-body" @click.outside="closeModal()">
+    <section @click.outside="closeModal()"
+             class="modal-card-body">
       <!-- Login form -->
       <form @submit.prevent="">
         <div class="field">
           <label for="login-username-input" class="label">Username</label>
           <div class="control">
             <label>
-              <input id="login-username-input"
+              <input x-ref="usernameInput"
+                     x-model="username"
+                     id="login-username-input"
                      class="input"
                      type="text"
-                     x-model="username"
-                     placeholder="Your username">
+                     placeholder="Your username"
+                     autocomplete="username">
             </label>
           </div>
         </div>
@@ -33,16 +40,17 @@
                    class="input"
                    type="password"
                    x-model="password"
-                   placeholder="Your password">
+                   placeholder="Your password"
+                   autocomplete="current-password">
           </div>
         </div>
       </form>
     </section>
     <footer class="modal-card-foot">
-      <button class="button is-success"
-              @click="$store.app.login()">Login
-      </button>
-      <button class="button" @click="$store.app.goToRegister()">Register instead</button>
+      <button @click="$store.app.login()"
+              class="button is-success">Login</button>
+      <button @click="$store.app.goToRegister()"
+              class="button" >Register instead</button>
     </footer>
   </div>
 </div>

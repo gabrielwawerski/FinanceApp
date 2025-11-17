@@ -1,4 +1,14 @@
 :root {
+  --bulma-primary-h: 210deg;
+  --bulma-primary-l: 61%;
+  --bulma-info-h: 192deg;
+  --bulma-info-s: 66%;
+  --bulma-success-h: 138deg;
+  --bulma-success-s: 57%;
+  --bulma-danger-h: 360deg;
+  --bulma-danger-l: 59%;
+  --bulma-scheme-h: 209;
+
   /* Layout */
   --container-max-width: 800px;
   --transition: all 0.2s ease;
@@ -31,4 +41,9 @@
   --text: var(--dark-text);
   --muted: var(--dark-muted);
   --border: var(--dark-border);
+}
+
+body {
+  overflow: hidden;
+  max-height: 100vh;
 }

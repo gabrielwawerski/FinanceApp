@@ -1,19 +1,18 @@
 /**
  * Login modal Alpine.js component
- * @namespace loginModal
+ * @namespace LoginModal
  * @type {Function}
  * @returns {Object} Alpine.js component with methods and properties
  */
-export const loginModal = () => ({
+export const LoginModal = () => ({
   username: '',
   password: '',
 
   /**
    * Initialize the component
-   * @memberof loginModal
+   * @memberof LoginModal
    */
   init() {
-	this.$watch('username', () => Alpine.store('currentUser').name = this.username);
   },
 
   closeModal() {

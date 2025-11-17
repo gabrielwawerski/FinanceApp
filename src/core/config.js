@@ -1,4 +1,4 @@
-// Define available pages as a frozen object for immutability
+// Define available views as a frozen object for immutability
 export const PAGES = Object.freeze({
   LANDING: 'landing',
   LOGIN: 'login',
@@ -13,28 +13,51 @@ export const MODAL_CONTAINER_ID = 'modal-content';
 // Route definitions with only static data
 export const ROUTE_CONFIGS = Object.freeze({
   [PAGES.LOGIN]: {
-	url: '/pages/auth/login.html',
+	url: '/views/auth/login.html',
 	target: `#${MODAL_CONTAINER_ID}`
   },
   [PAGES.REGISTER]: {
-	url: '/pages/auth/register.html',
+	url: '/views/auth/register.html',
 	target: `#${MODAL_CONTAINER_ID}`,
   },
   [PAGES.DASHBOARD]: {
-	url: '/pages/dashboard/dashboard.html',
+	url: '/views/dashboard/dashboard.html',
 	target: `#${MAIN_CONTAINER_ID}`,
   },
   [PAGES.LANDING]: {
-	url: '/pages/landing.html',
+	url: '/views/landing.html',
 	target: `#${MAIN_CONTAINER_ID}`,
   },
   error: {
-	url: '/pages/404.html',
+	url: '/views/404.html',
 	target: `#${MAIN_CONTAINER_ID}`,
   }
 });
 
 export const RESTRICTED_PAGES = [PAGES.LOGIN, PAGES.REGISTER, 'error'];
+
+
+export const TR_KEYS = {
+  LANG_NAME: 'lang_name',
+  LANG_KEY: 'lang_key',
+  APP_NAME: 'app_name',
+  LOGIN: 'login',
+  LOGOUT: 'logout',
+  REGISTER: 'register',
+  SETTINGS: 'settings',
+
+  LANDING_SUBTITLE: 'landing_subtitle',
+  DASHBOARD: 'dashboard',
+};
+
+export const DEFAULT_LOCALE = 'en';
+export const DEFAULT_THEME = 'dark';
+
+export const APP_STORE_NAME = 'app';
+export const TRANSLATION_STORE_NAME = 'locale';
+
+
+export const LS_APP_LANG = 'locale.lang';
 
 /** `authToken` **/
 export const LS_AUTH_TOKEN = 'authToken';

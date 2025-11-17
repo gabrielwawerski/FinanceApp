@@ -1,0 +1,13 @@
+{
+  "lang_key": "en",
+  "lang_name": "English",
+  "app_name": "Finance Manager",
+
+  "login": "Login",
+  "logout": "Logout",
+  "register": "Register",
+  "settings": "Settings",
+  "dashboard": "Dashboard",
+
+  "landing_subtitle": "Track your finances with ease"
+}

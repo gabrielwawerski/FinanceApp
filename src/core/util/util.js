@@ -2,12 +2,13 @@ import Alpine from 'alpinejs';
 
 
 /**
- * Persist data to localStorage with fallback handling
- * @param {*} defaultValue - Default value to use if none found or invalid
+ * Persist data to `localStorage` with fallback handling
  * @param {string} key - localStorage key
+ * @param {*} value - Actual value to store
+ * @param {*} defaultValue - Default value to use if none found or invalid
  * @returns {*} Alpine.js persisted value
  */
-export function persist(defaultValue, key) {
+export function safePersist(key, value, defaultValue = value) {
   try {
 	const stored = localStorage.getItem(key);
 
@@ -31,12 +32,14 @@ export function persist(defaultValue, key) {
 	  return Alpine.$persist(parsed).as(key);
 	} catch (parseError) {
 	  // Invalid JSON - use default value
-	  console.warn(`Invalid JSON in localStorage for key "${key}", using default value`);
+	  console.warn(`Invalid JSON in localStorage for key "${key}", using default value: ${defaultValue}`);
+	  localStorage.removeItem(key)
 	  return Alpine.$persist(defaultValue).as(key);
 	}
   } catch (error) {
 	// Any other error - use default value
 	console.warn(`Error accessing localStorage for key "${key}", using default value:`, error);
+	localStorage.removeItem(key)
 	return Alpine.$persist(defaultValue).as(key);
   }
 }

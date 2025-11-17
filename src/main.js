@@ -9,12 +9,19 @@ import focus from '@alpinejs/focus';
 import persist from '@alpinejs/persist';
 import morph from "@alpinejs/morph";
 // Import stores using aliases
-import { appStore } from "@stores/app.js";
-import { loginModal } from "@/modals/loginModal.js";
+import { AppStore } from "@stores/app.js";
+import { TranslationStore } from "@stores/translation.js";
+// import
+import { LoginModal } from "@/modals/login/LoginModal.js";
 // Import components
-import '@components/theme-toggle.js';
-import { PAGES, RESTRICTED_PAGES } from "@core/config.js";
+import '@components/ThemeToggle.js';
+import { DEFAULT_LOCALE, LS_APP_LANG, PAGES, RESTRICTED_PAGES, TR_KEYS } from "@core/config.js";
+import { loadTranslations } from "@util/file-util.js";
 
+window.TR_KEYS = TR_KEYS
+
+const locale = (localStorage.getItem(LS_APP_LANG) || DEFAULT_LOCALE).replace(/"/g,'');
+const translations = await loadTranslations(locale);
 
 // Register Alpine plugins
 Alpine.plugin(focus);
@@ -24,10 +31,10 @@ Alpine.plugin(morph);
 // JS Modules way of adding stores(Alpine.store) and components(Alpine.data):
 // Everything needs to be done BEFORE Alpine.start()
 // Register stores with Alpine.plugin()
-Alpine.plugin(appStore);
-// Alpine.plugin(loginModal);
+Alpine.plugin(AppStore);
+Alpine.plugin(TranslationStore(locale, translations));
 
-Alpine.data('loginModal', loginModal)
+Alpine.data('LoginModal', LoginModal)
 
 // Configure htmx
 htmx.config.selfRequestsOnly = false;
@@ -59,7 +66,7 @@ document.addEventListener('alpine:init', () => {
 
   if ('serviceWorker' in navigator) {
 	window.addEventListener('load', () => {
-	  navigator.serviceWorker.register('/src/service-worker.js')
+	  navigator.serviceWorker.register('/service-worker.js')
 		 .then(registration => {
 		   console.log('ServiceWorker registered with scope:', registration.scope);
 		 })
@@ -81,7 +88,6 @@ document.addEventListener('alpine:init', () => {
 	  app.navigateTo(fallback, {updateHistory: false});
 	}
   });
-
 
 });
 

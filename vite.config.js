@@ -12,7 +12,7 @@ export default defineConfig({
       '@stores': resolve(__dirname, 'src/core/stores'),
       '@db': resolve(__dirname, 'src/core/database'),
       '@util': resolve(__dirname, 'src/core/util'),
-      '@pages': resolve(__dirname, 'src/core/pages'),
+      '@views': resolve(__dirname, 'src/core/views'),
       '@css': resolve(__dirname, 'src/css')
     }
   },
@@ -25,7 +25,7 @@ export default defineConfig({
     }
   },
   server: {
-    port: 3000,
+    port: 3003,
     open: true
   }
 });
