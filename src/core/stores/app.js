@@ -11,21 +11,17 @@ export const AppStore = (Alpine) => {
   Alpine.store('app', {
     currentUser: null,
     lastPage: null,
-    isReady: false,
     currentPage: '',
     isMobile: safePersist('app.isMobile', false),
     isDarkTheme: safePersist('app.isDarkTheme', true),
     showLoginModal: false,
 
     async init() {
-      startBackgroundJobs(); // ← critical
-
-      const splashMinDuration = 1200; // minimum time splash is visible
-      const splashStart = performance.now();
+      startBackgroundJobs();
 
       const token = localStorage.getItem('sessionToken');
       if (token) {
-        const user = await DatabaseService.getCurrentUser(); // checks expiry too
+        const user = await DatabaseService.getCurrentUser();
         if (user) {
           this.currentUser = user;
           const lastPage = await DatabaseService.loadPage(user.id);
@@ -40,15 +36,7 @@ export const AppStore = (Alpine) => {
       const handleResize = () => this.setMobile(window.innerWidth <= 768);
       window.addEventListener('resize', throttle(handleResize, 250));
       handleResize();
-
-      // Ensure splash is visible at least `splashMinDuration`
-      const elapsed = performance.now() - splashStart;
-      const remaining = Math.max(0, splashMinDuration - elapsed);
-      setTimeout(() => {
-        this.isReady = true; // triggers splash fade
-        document.body.classList.add('app-ready'); // fades in main layout
-        document.body.classList.remove('opacity-0');
-      }, remaining);
+      console.log('AppStore initialized');
     },
 
     /* --------------------

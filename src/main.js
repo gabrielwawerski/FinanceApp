@@ -32,8 +32,13 @@ async function initializeDatabase() {
 
 // ===================== APP INIT =====================
 document.addEventListener('DOMContentLoaded', async () => {
+  const splash = document.getElementById('splash');
+  const appContent = document.getElementById('app-content');
+  const MIN_SPLASH = 1000;
+  const start = performance.now();
+
   startBackgroundJobs();
-  initializeDatabase().catch(() => console.warn('Degraded mode'));
+  await initializeDatabase();
 
   const locale = (localStorage.getItem(LS_APP_LANG) || DEFAULT_LOCALE).replace(/"/g, '');
   const translations = await loadTranslations(locale);
@@ -68,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           document.getElementById('page-body').classList.remove('fade-out');
           document.getElementById('page-body').classList.add('fade-in');
         }
-      }, 225);
+      }, 200);
     }
   });
 
@@ -82,37 +87,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   Alpine.start();
 
-	document.addEventListener('alpine:initialized', () => {
-	  // ===================== SERVICE WORKER =====================
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register(`${BASE}service-worker.js`)
-         .then(reg => console.log('SW registered:', reg.scope))
-         .catch(err => console.error('SW failed:', err));
-    });
-  }
-})
+  document.addEventListener('alpine:initialized', async () => {
+    // ===================== SERVICE WORKER =====================
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register(`${BASE}service-worker.js`)
+           .then(reg => console.log('SW registered:', reg.scope))
+           .catch(err => console.error('SW failed:', err));
+      });
+    }
+  })
+
 
   // ===================== SPLASH FADE =====================
-  const splash = document.getElementById('splash');
-  const appContent = document.getElementById('app-content');
-
-  const MIN_SPLASH = 1200; // ms
-  const start = performance.now();
-
-  // Initialize app (load DB, session, user, etc.)
-  await Alpine.store('app').init();
-
   // Ensure minimum splash duration
   const elapsed = performance.now() - start;
   const remaining = Math.max(0, MIN_SPLASH - elapsed);
 
   setTimeout(() => {
     splash.classList.add('opacity-0');   // fade out splash
-    appContent.classList.add('visible'); // fade in app content
+    setTimeout(() => {
+          appContent.classList.add('visible'); // fade in app content
+    },300);
 
     // Remove splash after transition
-    setTimeout(() => splash.remove(), 700);
+    setTimeout(() => splash.remove(), 400);
   }, remaining);
 });
 
