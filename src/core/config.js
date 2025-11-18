@@ -11,7 +11,7 @@ export const PAGES = Object.freeze({
 export const MAIN_CONTAINER_ID = 'main-content';
 export const MODAL_CONTAINER_ID = 'modal-content';
 
-const BASE = import.meta.env.BASE_URL;
+export const BASE = import.meta.env.BASE_URL;
 
 export const ROUTE_CONFIGS = Object.freeze({
 	[PAGES.LOGIN]: {

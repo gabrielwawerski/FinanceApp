@@ -16,8 +16,75 @@
   <link rel="stylesheet" href="/src/css/style.css">
   <script type="module" src="/src/main.js"></script>
 </head>
-<body>
-<!-- Navigation -->
+
+<!-- ====================== SPLASH SCREEN ====================== -->
+
+
+<body id="page-body" class="min-h-screen transition-opacity duration-500 opacity-0" x-data>
+<div id="splash"
+     class="fixed inset-0 z-[9999] flex flex-col items-center justify-center
+            bg-gradient-to-br from-emerald-50 to-teal-100
+            dark:from-gray-900 dark:to-gray-800
+            transition-opacity duration-700 ease-out opacity-100 pointer-events-auto">
+
+    <!-- Logo / Loader -->
+    <div class="mb-8 relative text-center">
+      <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="mx-auto">
+        <!-- Background Circle -->
+        <circle cx="60" cy="60" r="50" fill="none" stroke="currentColor" stroke-width="3"
+                class="text-emerald-500/20 dark:text-emerald-400/20"/>
+        <!-- Animated Ring -->
+        <circle cx="60" cy="60" r="50" fill="none" stroke="currentColor" stroke-width="4"
+                class="text-emerald-500 dark:text-emerald-400 origin-center animate-spin-slow"
+                stroke-dasharray="280" stroke-dashoffset="280"
+                style="animation: dash 4s linear infinite, spin 8s linear infinite;">
+          <animate attributeName="stroke-dashoffset" from="280" to="0" dur="4s" repeatCount="indefinite"/>
+        </circle>
+
+        <!-- Inner Logo Icon -->
+        <g transform="translate(60,60)" class="text-emerald-600 dark:text-emerald-400">
+          <!-- Coins -->
+          <circle cx="-15" cy="-10" r="12" fill="currentColor" opacity="0.8"/>
+          <circle cx="0" cy="-15" r="14" fill="currentColor" opacity="0.9"/>
+          <circle cx="15" cy="-10" r="12" fill="currentColor" opacity="0.8"/>
+          <!-- Up Arrow -->
+          <path d="M -8 -25 L 0 -35 L 8 -25 L 4 -25 L 4  -5 L -4 -5 L -4 -25 Z" fill="currentColor"/>
+          <!-- Dollar Sign -->
+          <text x="0" y="8" font-size="28" font-weight="bold" text-anchor="middle" fill="currentColor" class="font-mono">
+            $
+          </text>
+        </g>
+      </svg>
+    </div>
+
+    <!-- App Name -->
+    <h1 class="text-4xl font-bold text-gray-800 dark:text-white mb-3 tracking-tight">
+      FinanceFlow
+    </h1>
+
+    <!-- Tagline -->
+    <p class="text-sm text-gray-600 dark:text-gray-400 mb-8">
+      Offline-First&nbsp&nbsp•&nbsp&nbspSecure&nbsp&nbsp•&nbsp&nbspYours
+    </p>
+
+    <!-- Spinner / Loading Bar -->
+    <div class="w-48 h-1.5 bg-gray-300/50 dark:bg-gray-700/50 rounded-full overflow-hidden mx-auto mb-6">
+      <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full animate-pulse"
+           style="width: 70%; animation: loading-bar 3s ease-in-out infinite;">
+      </div>
+    </div>
+
+    <!-- Loading Text with Bounce Dots -->
+    <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+      Loading your financial world
+      <span class="inline-block animate-bounce delay-0">.</span>
+      <span class="inline-block animate-bounce delay-100">.</span>
+      <span class="inline-block animate-bounce delay-200">.</span>
+    </p>
+  </div>
+
+  <!-- ====================== NAVIGATION / LAYOUT ====================== -->
+<div id="app-content">
 <nav class="navbar is-transparent" role="navigation" aria-label="main navigation" x-data="{ open: false }">
   <div class="container">
     <div class="navbar-brand">
@@ -27,10 +94,8 @@
       >
         <span x-text="$store.app.currentUser ? $store.locale.tr(TR_KEYS.DASHBOARD) : $store.locale.tr(TR_KEYS.APP_NAME)"></span>
       </a>
-      <a class="navbar-item has-text-weight-semibold" @click="await $store.locale.set('pl')">PL</a>
-      <a class="navbar-item has-text-weight-semibold" @click="await $store.locale.set('en')">EN</a>
       <a @click="$store.app.navigateTo('test')"
-              class="navbar-item">Test Page
+         class="navbar-item">Test Page
       </a>
       <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
          :class="{ 'is-active': open }"
@@ -56,14 +121,19 @@
         <template x-if="!$store.app.currentUser">
           <div class="navbar-item">
             <div class="buttons">
-              <theme-toggle></theme-toggle>
               <button @click="$store.app.goToLogin()"
                       x-text="$store.locale.tr(TR_KEYS.LOGIN)"
-                      class="button is-light"></button>
+                      class="button is-primary">
+              </button>
               <button @click="$store.app.goToDashboard()"
                       x-text="$store.locale.tr(TR_KEYS.REGISTER)"
                       class="button is-primary">
               </button>
+              <a class="navbar-item has-text-weight-semibold"
+                 style="margin-left: 1.5rem;"
+                 x-text="$store.locale.tr(TR_KEYS.LANG_NAME)"
+                 @click="await $store.locale.set($store.locale.locale === 'pl' ? 'en' : 'pl')">PL</a>
+              <theme-toggle></theme-toggle>
             </div>
           </div>
         </template>
@@ -71,11 +141,17 @@
     </div>
   </div>
 </nav>
-
+<div class="container has-text-centered">
+  <button x-data="{ fullPage: fullPageTransition }" class="button is-centered"
+          x-text="fullPage ? 'Page transition' : 'Content Transition'"
+          @click="fullPageTransition = !fullPageTransition; fullPage = !fullPage">
+  </button>
+</div>
 <!-- Main content container -->
-<div id="main-content"></div>
+<div id="main-content" data-barba="container" data-barba-namespace="home"></div>
 
 <!-- Auth modal container -->
-<div id="modal-content"></div>
+<div id="modal-content" data-barba="container" data-barba-namespace="modal"></div>
+</div>
 </body>
 </html>

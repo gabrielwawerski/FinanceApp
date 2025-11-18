@@ -1,107 +1,135 @@
-/**
- * @file Main application entry point
- * @description Initializes Alpine.js with plugins and stores, configures htmx, and starts the application
- * @namespace main.js
- */
+import db from "@db/db.js";
 import htmx from 'htmx.org';
 import Alpine from 'alpinejs';
 import focus from '@alpinejs/focus';
 import persist from '@alpinejs/persist';
-// import stores using aliases
+
 import { AppStore } from "@stores/app.js";
 import { TranslationStore } from "@stores/translation.js";
-// import
 import { LoginModal } from "@/modals/login/LoginModal.js";
-// import components
 import '@components/ThemeToggle.js';
-import { DEFAULT_LOCALE, LS_APP_LANG, PAGES, RESTRICTED_PAGES, TR_KEYS } from "@core/config.js";
+
+import { BASE, DEFAULT_LOCALE, LS_APP_LANG, PAGES, RESTRICTED_PAGES, TR_KEYS } from "@core/config.js";
 import { loadTranslations } from "@util/file-util.js";
-
-window.TR_KEYS = TR_KEYS
-
-const locale = (localStorage.getItem(LS_APP_LANG) || DEFAULT_LOCALE).replace(/"/g,'');
-const translations = await loadTranslations(locale);
-
-// register Alpine plugins
-Alpine.plugin(focus);
-Alpine.plugin(persist);
-
-// register stores with Alpine.plugin()
-Alpine.plugin(AppStore);
-Alpine.plugin(TranslationStore(locale, translations));
-
-// register alpine components
-Alpine.data('LoginModal', LoginModal)
-
-// Configure htmx
-htmx.config.selfRequestsOnly = false;
-htmx.config.defaultSwapStyle = 'innerHTML';
-
-// Make globals available for htmx and other libraries
-window.Alpine = Alpine;
-window.htmx = htmx;
-
-document.body.addEventListener('htmx:beforeSwap', (event) => {
-	const target = event.detail.target;
-	if ((target.id === 'main-content' || target.id === 'modal-content') && target.firstElementChild) {
-		const oldContent = target.firstElementChild;
-		oldContent.classList.add('fade-out');
-
-		// Prevent immediate swap
-		event.detail.shouldSwap = false;
-
-		setTimeout(() => {
-			target.innerHTML = event.detail.xhr.responseText;
-			const newContent = target.firstElementChild;
-			newContent.classList.add('fade-in');
-		}, 300); // match animation duration
-	}
-});
+import { startBackgroundJobs } from '@db/db-service.js';
 
 
-document.body.addEventListener('htmx:afterSwap', (event) => {
-	const target = event.detail.target;
-	if ((target.id === 'main-content' || target.id === 'modal-content') && target.firstElementChild) {
-		const newContent = target.firstElementChild;
-		newContent.classList.add('fade-in');
-	}
-});
+window.TR_KEYS = TR_KEYS;
 
-
-
-document.addEventListener('alpine:init', () => {
-  // Handle ALL htmx swaps with Morph to preserve Alpine state
-  if ('serviceWorker' in navigator) {
-	window.addEventListener('load', () => {
-	  navigator.serviceWorker.register('/service-worker.js')
-		 .then(registration => {
-		   console.log('ServiceWorker registered with scope:', registration.scope);
-		 })
-		 .catch(error => {
-		   console.error('ServiceWorker registration failed:', error);
-		 });
-	});
+// ===================== DATABASE =====================
+async function initializeDatabase() {
+  try {
+    await db.open();
+    console.log(`✅ Database opened: ${db.name} v${db.verno}`);
+  } catch (error) {
+    console.error('❌ Failed to open database', error);
+    if (error.name === 'UpgradeError' || error.name === 'VersionError') {
+      await db.delete();
+      await db.open();
+    }
   }
+}
+
+// ===================== APP INIT =====================
+document.addEventListener('DOMContentLoaded', async () => {
+  startBackgroundJobs();
+  initializeDatabase().catch(() => console.warn('Degraded mode'));
+
+  const locale = (localStorage.getItem(LS_APP_LANG) || DEFAULT_LOCALE).replace(/"/g, '');
+  const translations = await loadTranslations(locale);
+
+  Alpine.plugin(focus);
+  Alpine.plugin(persist);
+  Alpine.plugin(AppStore);
+  Alpine.plugin(TranslationStore(locale, translations));
+  Alpine.data('LoginModal', LoginModal);
+
+  window.Alpine = Alpine;
+  window.htmx = htmx;
+
+  htmx.config.selfRequestsOnly = false;
+  htmx.config.defaultSwapStyle = 'innerHTML';
+  window.fullPageTransition = false;
+
+  // ===================== HTMX SWAP ANIMATION =====================
+  document.body.addEventListener('htmx:beforeSwap', (event) => {
+    const target = event.detail.target;
+    if ((target.id === 'main-content' || target.id === 'modal-content') && target.firstElementChild) {
+      const oldContent = target.firstElementChild;
+      oldContent.classList.add('fade-out');
+      if (fullPageTransition) document.getElementById('page-body').classList.add('fade-out');
+      event.detail.shouldSwap = false;
+
+      setTimeout(() => {
+        target.innerHTML = event.detail.xhr.responseText;
+        const newContent = target.firstElementChild;
+        newContent.classList.add('fade-in');
+        if (fullPageTransition) {
+          document.getElementById('page-body').classList.remove('fade-out');
+          document.getElementById('page-body').classList.add('fade-in');
+        }
+      }, 225);
+    }
+  });
+
+  document.body.addEventListener('htmx:afterSwap', (event) => {
+    const target = event.detail.target;
+    if ((target.id === 'main-content' || target.id === 'modal-content') && target.firstElementChild) {
+      const newContent = target.firstElementChild;
+      newContent.classList.add('fade-in');
+    }
+  });
+
+  Alpine.start();
+
+	document.addEventListener('alpine:initialized', () => {
+	  // ===================== SERVICE WORKER =====================
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register(`${BASE}service-worker.js`)
+         .then(reg => console.log('SW registered:', reg.scope))
+         .catch(err => console.error('SW failed:', err));
+    });
+  }
+})
+
+  // ===================== SPLASH FADE =====================
+  const splash = document.getElementById('splash');
+  const appContent = document.getElementById('app-content');
+
+  const MIN_SPLASH = 1200; // ms
+  const start = performance.now();
+
+  // Initialize app (load DB, session, user, etc.)
+  await Alpine.store('app').init();
+
+  // Ensure minimum splash duration
+  const elapsed = performance.now() - start;
+  const remaining = Math.max(0, MIN_SPLASH - elapsed);
+
+  setTimeout(() => {
+    splash.classList.add('opacity-0');   // fade out splash
+    appContent.classList.add('visible'); // fade in app content
+
+    // Remove splash after transition
+    setTimeout(() => splash.remove(), 700);
+  }, remaining);
 });
-
-
-// Start Alpine after all registrations are complete
-Alpine.start();
 
 
 // document.addEventListener('alpine:init', () => {
-  // window.addEventListener('popstate', (event) => {
-	// const state = event.state || {};
-	// const app = Alpine.store('app');
-  //
-	// if (state.page && !RESTRICTED_PAGES.includes(state.page)) {
-	//   console.log(`Navigating to page: ${state.page}`);
-	//   app.navigateTo(state.page, {updateHistory: false});
-	// } else {
-	//   console.log('Navigating to fallback page...');
-	//   // Optional: if user hits restricted page, redirect to landing/dashboard
-	//   const fallback = app.currentUser ? PAGES.DASHBOARD : PAGES.LANDING;
-	//   app.navigateTo(fallback, {updateHistory: false});
-	// }
-  // });
+// window.addEventListener('popstate', (event) => {
+// const state = event.state || {};
+// const app = Alpine.store('app');
+//
+// if (state.page && !RESTRICTED_PAGES.includes(state.page)) {
+//   console.log(`Navigating to page: ${state.page}`);
+//   app.navigateTo(state.page, {updateHistory: false});
+// } else {
+//   console.log('Navigating to fallback page...');
+//   // Optional: if user hits restricted page, redirect to landing/dashboard
+//   const fallback = app.currentUser ? PAGES.DASHBOARD : PAGES.LANDING;
+//   app.navigateTo(fallback, {updateHistory: false});
+// }
+// });
 // });

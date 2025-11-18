@@ -10,7 +10,7 @@ export default defineConfig({
       '@components': resolve(__dirname, 'src/components'),
       '@core': resolve(__dirname, 'src/core'),
       '@stores': resolve(__dirname, 'src/core/stores'),
-      '@db': resolve(__dirname, 'src/core/database'),
+      '@db': resolve(__dirname, 'src/core/db'),
       '@util': resolve(__dirname, 'src/core/util'),
       '@views': resolve(__dirname, 'src/core/views'),
       '@css': resolve(__dirname, 'src/css')
@@ -25,7 +25,7 @@ export default defineConfig({
     }
   },
   server: {
-    port: 3003,
+    port: 3006,
     open: true
   }
 });

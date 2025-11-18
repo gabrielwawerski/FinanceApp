@@ -3,11 +3,12 @@
      x-show="$store.app.showLoginModal"
      x-trap.noscroll="$store.app.showLoginModal"
      :class="{ 'is-active': $store.app.showLoginModal}"
+     @keydown.escape="closeModal()"
      id="login-modal"
      class="modal is-active">
 
   <div @click="closeModal()"
-       class="modal-background"></div>
+       class="modal-background" x-transition.opacity></div>
   <div id="login-modal-body" class="modal-card">
     <header class="modal-card-head">
       <p class="modal-card-title">Login</p>
