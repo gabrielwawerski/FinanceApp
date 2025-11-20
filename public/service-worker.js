@@ -26,7 +26,6 @@ const PRECACHE_URLS = [
    // Assets
    `./images/favicon/web-app-manifest-192x192.png`,
    `./images/favicon/web-app-manifest-512x512.png`,
-   `./images/favicon/`
 
   // Fallback assets
   `./offline.html`,            // ← You MUST create this!

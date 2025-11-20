@@ -9,7 +9,6 @@ import { LoginModal } from "@/modals/login/login-modal.js";
 import '@components/theme-toggle.js';
 
 import {
-  BASE,
   DEFAULT_LOCALE,
   LS_APP_LANG,
   TR_KEYS,

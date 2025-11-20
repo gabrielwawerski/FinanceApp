@@ -9,8 +9,8 @@ export const PAGES = Object.freeze({
 });
 
 // UX constants — ONE SOURCE OF TRUTH
-export const SPLASH_MIN_DURATION = 1100;  // ms
-export const FADE_DURATION = 0.25;        // seconds — used for ALL fades
+export const SPLASH_MIN_DURATION = 1190;  // ms
+export const FADE_DURATION = 0.2;        // seconds — used for ALL fades
 export const LOADING_THRESHOLD = 800;    // ms before showing loader
 
 export const MAIN_CONTAINER_ID = 'main-content';

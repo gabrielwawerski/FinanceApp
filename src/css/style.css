@@ -35,7 +35,7 @@
   --dark-border: #444;
 
   /* Transitions */
-  --fade-duration: 0.25s;
+  --fade-duration: 0.2s;
 }
 
 [data-theme="dark"] {
@@ -58,8 +58,8 @@ body {
 }
 
 html {
-  -ms-overflow-style: none;     /* IE and Edge */
-  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 html::-webkit-scrollbar {
@@ -71,6 +71,7 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 body::-webkit-scrollbar {
   display: none;
 }
@@ -109,11 +110,49 @@ body::-webkit-scrollbar {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #86b0e1 0%, #0a5998 80%, #0c4b7a 100%);
+  background: none; /* no background here anymore */
   opacity: 1;
   transition: opacity var(--fade-duration) ease-out;
   pointer-events: none;
+  overflow: hidden; /* important for the blur edges */
 }
+
+/* Solid base — completely hides the page underneath */
+.gradient-base {
+  position: absolute;
+  inset: 0;
+  z-index: -22;
+  background: #0a5998; /* your exact brand color */
+  /* or use an even darker variant if you prefer */
+  /* background: #051f3d; */
+}
+
+/* Blurred animated glow — now sits safely on top of the solid base */
+.gradient-bg {
+  position: absolute;
+  inset: -100px;
+  z-index: -1;
+  background: linear-gradient(45deg,
+  #063e56 0%,
+  #0a5998 10%,
+  #0d6ef9 30%,
+  #186be1 50%,
+  #136cb2 70%,
+  #16749f 90%,
+  #085688 100%
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 16s ease infinite;
+  filter: blur(120px);
+}
+
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Your existing .fade-out and other styles remain unchanged */
 
 #app-content {
   pointer-events: none;
@@ -168,8 +207,8 @@ body::-webkit-scrollbar {
 }
 
 .modal-bg {
-  backdrop-filter: blur(2px) !important;           /* Modern browsers */
-  -webkit-backdrop-filter: blur(2px) !important;   /* Safari (still needed in 2025) */
+  backdrop-filter: blur(2px) !important; /* Modern browsers */
+  -webkit-backdrop-filter: blur(2px) !important; /* Safari (still needed in 2025) */
 }
 
 .modal-background-dummy {
