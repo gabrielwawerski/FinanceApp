@@ -11,24 +11,21 @@ const base = BASE.endsWith('/') ? BASE : BASE + '/';
 
 // Critical assets – these MUST load offline
 const PRECACHE_URLS = [
-  '/',                              // index.html (via /)
-  base,                             // e.g. /my-app/ → serves index.html
-  `${base}index.html`,
-  `${base}src/main.js`,
-  `${base}src/css/styles.css`,
-  `${base}manifest.json`,
+  './',                              // index.html (via /) // e.g. /my-app/ → serves index.html
+  `./index.html`,
+  `./src/main.js`,
+  `./src/css/styles.css`,
+  `./manifest.json`,
 
   // Core pages (offline-first)
-  `${base}views/landing.html`,
-  `${base}views/auth/login.html`,
-  `${base}views/auth/register.html`,
-  `${base}views/dashboard/dashboard.html`,
+  `./views/landing.html`,
+  `./views/auth/login.html`,
+  `./views/auth/register.html`,
+  `./views/dashboard/dashboard.html`,
 
   // Fallback assets
-  `${base}offline.html`,            // ← You MUST create this!
-  `${base}fallback.css`,            // Optional: minimal styles for offline
-  `${base}icons/icon-192x192.png`,
-  `${base}icons/icon-512x512.png`,
+  `./offline.html`,            // ← You MUST create this!
+  `./fallback.css`,            // Optional: minimal styles for offline
 ];
 
 // ──────────────────────────────────────────────────────────────
@@ -114,12 +111,12 @@ self.addEventListener('fetch', event => {
             const path = url.pathname;
 
             if (path.endsWith('.html') || request.headers.get('accept')?.includes('text/html')) {
-              return caches.match(`${base}offline.html`) ||
-                     caches.match(`${base}views/landing.html`);
+              return caches.match(`./offline.html`) ||
+                     caches.match(`./views/landing.html`);
             }
 
             if (path.endsWith('.css')) {
-              return caches.match(`${base}fallback.css`) ||
+              return caches.match(`./fallback.css`) ||
                      new Response('/* Offline – styles unavailable */', {
                        headers: { 'Content-Type': 'text/css' }
                      });
@@ -137,7 +134,7 @@ self.addEventListener('fetch', event => {
             }
 
             // Final fallback: try landing page
-            return caches.match(`${base}views/landing.html`);
+            return caches.match(`./views/landing.html`);
           });
       })
   );
@@ -152,8 +149,8 @@ self.addEventListener('push', event => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: `${base}icons/icon-192x192.png`,
-      badge: `${base}icons/icon-72x72.png`,
+      // icon: `${base}icons/icon-192x192.png`,
+      // badge: `${base}icons/icon-72x72.png`,
       tag: 'finance-notification',
       data: { url: data.url || base },
     })
@@ -162,7 +159,7 @@ self.addEventListener('push', event => {
 
 self.addEventListener('notificationclick', event => {
   event.notification.close();
-  const url = event.notification.data.url || base;
+  const url = event.notification.data.url || "./";
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })
