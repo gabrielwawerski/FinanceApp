@@ -1,5 +1,5 @@
 // service-worker.js
-import { BASE } from "@core/config.js";   // ← Yes! Keep this if BASE is not '/'
+import { BASE } from "/src/core/config.js";   // ← Yes! Keep this if BASE is not '/'
 
 // ──────────────────────────────────────────────────────────────
 // 1. CONFIG

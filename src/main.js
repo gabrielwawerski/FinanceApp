@@ -23,6 +23,16 @@ import { loadTranslations } from "@util/file-util.js";
 import { startBackgroundJobs } from '@db/db-service.js';
 import { initializeDatabase, seedPredefinedCategories } from "@db/db-util.js";
 
+// Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(`${BASE}public/service-worker.js`, {type: 'module'})
+       .then(reg => console.log('Service Worker registered:', reg.scope))
+       .catch(err => console.error('Service Worker registration failed:', err));
+  });
+}
+
+
 // Expose for templates
 window.TR_KEYS = TR_KEYS;
 
@@ -152,15 +162,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Finalize app state after Alpine is ready
   await Alpine.store('app').initPage();
-
-  // Service Worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register(`${BASE}service-worker.js`)
-         .then(reg => console.log('SW registered:', reg.scope))
-         .catch(err => console.error('SW registration failed:', err));
-    });
-  }
 
   // ===================== SPLASH HIDE =====================
   const elapsed = performance.now() - start;
