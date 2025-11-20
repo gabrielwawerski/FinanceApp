@@ -5,7 +5,7 @@ import { SYNC_STATUS, INDEX_NAMES } from './constants.js';
 
 export const db = new Dexie('finance_manager');
 
-db.version(4).stores({
+db.version(1).stores({
   // Users – local profile + secure password
   users: `
 		++id,
@@ -23,17 +23,21 @@ db.version(4).stores({
   // Sessions – with expiration
   session: '++id, user_id, token, expires_at, created_at',
 
-  // Categories – sync ready
+  // Categories – now with predefined + color + type
   categories: `
 		++id,
 		user_id,
 		server_id,
 		name,
+		predefined,
+		color,
+		type,
 		sync_status,
 		deleted_at,
 		version,
 		created_at,
-		updated_at
+		updated_at,
+		[name+predefined]
 	`.replace(/\s+/g, ''),
 
   // Transactions – optimized with compound index
@@ -53,5 +57,4 @@ db.version(4).stores({
 		${INDEX_NAMES.TRANSACTIONS_BY_USER_DATE}
 	`.replace(/\s+/g, '')
 });
-
 export default db;

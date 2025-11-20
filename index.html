@@ -1,161 +1,114 @@
 <!DOCTYPE html>
 <html lang="en" x-data :data-theme="$store.app.isDarkTheme ? 'dark' : 'light'">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Finance Manager</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="/node_modules/bulma/css/bulma.css">
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"/>
-  <link rel="stylesheet" href="/src/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/node_modules/bulma/css/bulma.css" />
+  <link rel="stylesheet" href="/src/css/style.css" />
   <script type="module" src="/src/main.js"></script>
 </head>
-
-<!-- ====================== SPLASH SCREEN ====================== -->
-
-
-<body id="page-body" class=" transition-opacity duration-400 opacity-0" x-data>
-<div id="splash"
-     class="hero is-fullheight-with-navbar has-text-centered transition-opacity opacity-100 pointer-events-none"
-     style="
-background: linear-gradient(135deg, #86b0e1 0%, #0a5998 80%, #0c4b7a 100%);
-     position: fixed;
-     inset: 0;
-     z-index: 9999;
-     display: flex;
-     flex-direction: column;
-     justify-content: center;
-     align-items: center;
-     transition: opacity 0.4s ease-out;">
-
-  <!-- Logo / Loader -->
-  <!-- Logo / Loader -->
-  <div class="mb-6" style="position: relative;">
+<body id="page-body" class="fade-in" x-data>
+<!-- Global loader (for slow requests) -->
+<div id="global-loader" class="hero has-text-centered hidden" style="pointer-events: none;">
     <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-      <!-- Background Circle -->
       <circle cx="60" cy="60" r="50" fill="none" stroke="#ffffff33" stroke-width="3"/>
-      <!-- Animated Ring -->
-      <circle cx="60"
-              cy="60"
-              r="50"
-              fill="none"
-              stroke="#4ade80"
-              stroke-width="4"
-              stroke-dasharray="280"
-              stroke-dashoffset="280"
+      <circle cx="60" cy="60" r="50" fill="none" stroke="#4ade80" stroke-width="4"
+              stroke-dasharray="280" stroke-dashoffset="280"
               style="animation: dash 3.5s linear infinite, spin 7s linear infinite; transform-origin: 50% 50%;">
-        <animate attributeName="stroke-dashoffset" from="280" to="0" dur="3.5s" repeatCount="indefinite"/>
       </circle>
-
-      <!-- Inner Logo Icon -->
-      <g transform="translate(60,60)" fill="#22c55e" opacity="0.9">
+      <g transform="translate(60,71)" fill="#22c55e" opacity="0.9">
         <circle cx="-15" cy="-10" r="12"/>
         <circle cx="0" cy="-15" r="14"/>
         <circle cx="15" cy="-10" r="12"/>
-        <path d="M -8 -25 L 0 -35 L 8 -25 L 4 -25 L 4  -5 L -4 -5 L -4 -25 Z"/>
+        <path d="M -8 -25 L 0 -35 L 8 -25 L 4 -25 L 4 -5 L -4 -5 L -4 -25 Z"/>
         <text x="0" y="8" font-size="28" font-weight="bold" text-anchor="middle" font-family="monospace">$</text>
       </g>
     </svg>
-  </div>
-
-  <!-- App Name -->
-  <h1 class="title is-1 has-text-weight-bold" style="color: #e0f2fe; animation: fadeIn 1.5s ease-out;">
-    FinanceFlow
-  </h1>
-
-  <!-- Tagline -->
-  <p class="subtitle is-5" style="color: #c7d2fe; animation: fadeIn 2s ease-out;">
-    Offline-First &nbsp;•&nbsp; Secure &nbsp;•&nbsp; Yours
-  </p>
-
-  <!-- Loading Bar -->
-  <div class="progress is-medium is-success mb-4" style="width: 220px; overflow: hidden;">
-    <div class="progress-bar" style="width: 70%; animation: loading-bar 3s ease-in-out infinite;"></div>
-  </div>
-
-  <!-- Loading Text with Bounce Dots -->
-  <p class="is-size-6" style="color: #e0f2fe;">
-    Loading your financial world
-    <span style="display:inline-block; animation: bounce 1s infinite 0s;">.</span>
-    <span style="display:inline-block; animation: bounce 1s infinite 0.2s;">.</span>
-    <span style="display:inline-block; animation: bounce 1s infinite 0.4s;">.</span>
-  </p>
 </div>
 
-<!-- ====================== NAVIGATION / LAYOUT ====================== -->
-<div id="app-content">
-  <nav class="navbar is-transparent" role="navigation" aria-label="main navigation" x-data="{ open: false }">
-    <div class="container">
-      <div class="navbar-brand">
-        <a
-           class="navbar-item has-text-weight-semibold"
-           @click="open = false; $store.app.handleLogoClick()"
-        >
-          <span x-text="$store.app.currentUser ? $store.locale.tr(TR_KEYS.DASHBOARD) : $store.locale.tr(TR_KEYS.APP_NAME)"></span>
-        </a>
-        <a @click="$store.app.navigateTo('test')"
-           class="navbar-item">Test Page
-        </a>
+  <!-- Splash Screen -->
+  <div id="splash" class="hero has-text-centered">
+    <div class="mb-6">
+      <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="60" cy="60" r="50" fill="none" stroke="#ffffff33" stroke-width="3"/>
+        <circle cx="60" cy="60" r="50" fill="none" stroke="#4ade80" stroke-width="4"
+                stroke-dasharray="280" stroke-dashoffset="280"
+                style="animation: dash 3.5s linear infinite, spin 7s linear infinite; transform-origin: 50% 50%;">
+        </circle>
+        <g transform="translate(60,71)" fill="#22c55e" opacity="0.9">
+          <circle cx="-15" cy="-10" r="12"/>
+          <circle cx="0" cy="-15" r="14"/>
+          <circle cx="15" cy="-10" r="12"/>
+          <path d="M -8 -25 L 0 -35 L 8 -25 L 4 -25 L 4 -5 L -4 -5 L -4 -25 Z"/>
+          <text x="0" y="8" font-size="28" font-weight="bold" text-anchor="middle" font-family="monospace">$</text>
+        </g>
+      </svg>
+    </div>
+    <h1 class="title is-1 has-text-weight-bold" style="color: #e0f2fe; animation: text-fade-in 1.5s ease-out;">
+      FinanceFlow
+    </h1>
+    <p class="subtitle is-5" style="color: #c7d2fe; animation: text-fade-in 2s ease-out;">
+      Offline-First &nbsp;•&nbsp; Secure &nbsp;•&nbsp; Yours
+    </p>
+    <div class="progress is-medium is-success mb-4" style="width: 220px; overflow: hidden;">
+      <div class="progress-bar" style="width: 70%; animation: loading-bar 3s ease-in-out infinite;"></div>
+    </div>
+  </div>
 
-        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
-           :class="{ 'is-active': open }"
-           @click="open = !open">
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-        </a>
-      </div>
+  <div id="modal-bg" class="modal-background-dummy modal-background modal-bg"></div>
 
-      <div id="main-navbar" class="navbar-menu" :class="{ 'is-active': open }">
-        <div class="navbar-start"></div>
-
-        <div class="navbar-end" style="gap:0.5rem;">
-          <template x-if="$store.app.currentUser">
-            <theme-toggle></theme-toggle>
-            <a class="navbar-item" @click="open = false;$store.app.logout();" title="Logout">
-              <i class="fas fa-sign-out-alt"></i>
-            </a>
-          </template>
-
-          <template x-if="!$store.app.currentUser">
-            <div class="navbar-item">
-              <div class="buttons">
-                    <button x-data="{ fullPage: fullPageTransition }" class="button"
-            x-text="fullPage ? 'Page transition' : 'Content Transition'"
-            @click="fullPageTransition = !fullPageTransition; fullPage = !fullPage">
-    </button>
-                <button @click="$store.app.goToLogin()"
-                        x-text="$store.locale.tr(TR_KEYS.LOGIN)"
-                        class="button is-primary">
-                </button>
-                <button @click="$store.app.goToDashboard()"
-                        x-text="$store.locale.tr(TR_KEYS.REGISTER)"
-                        class="button is-primary">
-                </button>
-                <a class="navbar-item has-text-weight-semibold"
-                   style="margin-left: 1.5rem;"
-                   x-text="$store.locale.tr(TR_KEYS.LANG_NAME)"
-                   @click="await $store.locale.set($store.locale.locale === 'pl' ? 'en' : 'pl')">PL</a>
-                <theme-toggle></theme-toggle>
+  <div id="app-content" class="hidden">
+    <nav class="navbar is-transparent" x-data="{ open: false }">
+      <div class="container">
+        <div class="navbar-brand">
+          <a class="navbar-item has-text-weight-semibold"
+             @click="open = false; $store.app.handleLogoClick()">
+            <span x-text="$store.app.currentUser ? $store.locale.tr(TR_KEYS.DASHBOARD) : $store.locale.tr(TR_KEYS.APP_NAME)"></span>
+          </a>
+          <a @click="$store.app.navigateTo('test')" class="navbar-item">Test Page</a>
+          <a role="button" class="navbar-burger" :class="{ 'is-active': open }" @click="open = !open">
+            <span></span><span></span><span></span><span></span>
+          </a>
+        </div>
+        <div class="navbar-menu" :class="{ 'is-active': open }">
+          <div class="navbar-start"></div>
+          <div class="navbar-end" style="gap:0.5rem;">
+            <template x-if="$store.app.currentUser">
+              <theme-toggle></theme-toggle>
+              <a class="navbar-item" @click="open = false; $store.app.logout()" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+              </a>
+            </template>
+            <template x-if="!$store.app.currentUser">
+              <div class="navbar-item">
+                <div class="buttons">
+                  <span class="are-small">Transition: </span>
+                  <button x-data="{ fp: fullPageTransition }"
+                          @click="$el.textContent = (fp = !fp) ? 'Page' : 'Content'; fullPageTransition = fp"
+                          x-text="fullPageTransition ? 'Page' : 'Content'"
+                          class="button is-small"></button>
+                  <button @click="$store.app.goToLogin()"
+                          x-text="$store.locale.tr(TR_KEYS.LOGIN)"
+                          class="button is-primary is-small"></button>
+                  <button @click="$store.app.goToDashboard()"
+                          x-text="$store.locale.tr(TR_KEYS.REGISTER)"
+                          class="button is-primary is-small"></button>
+                  <a class="navbar-item has-text-weight-semibold"
+                     @click="await $store.locale.set($store.locale.locale === 'pl' ? 'en' : 'pl')"
+                     x-text="$store.locale.tr(TR_KEYS.LANG_NAME)"></a>
+                  <theme-toggle></theme-toggle>
+                </div>
               </div>
-            </div>
-          </template>
+            </template>
+          </div>
         </div>
       </div>
-    </div>
-  </nav>
-  <!-- Main content container -->
-  <div id="main-content"></div>
+    </nav>
 
-  <!-- Auth modal container -->
-  <div id="modal-content"></div>
-</div>
+    <div id="main-content"></div>
+    <div id="modal-content"></div>
+  </div>
 </body>
 </html>

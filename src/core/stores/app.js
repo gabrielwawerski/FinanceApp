@@ -1,7 +1,8 @@
 import htmx from 'htmx.org';
 import { clearById, safePersist, throttle } from '@util/util.js';
 import {
-  AUTH_LOGIN_EVENT, AUTH_LOGOUT_EVENT, MAIN_CONTAINER_ID, MODAL_CONTAINER_ID, PAGES, RESTRICTED_PAGES, ROUTE_CONFIGS
+  AUTH_LOGIN_EVENT, AUTH_LOGOUT_EVENT, FADE_DURATION, MAIN_CONTAINER_ID, MODAL_CONTAINER_ID, PAGES, RESTRICTED_PAGES,
+  ROUTE_CONFIGS
 } from '@core/config.js';
 import { events } from '@core/events.js';
 import DatabaseService, { startBackgroundJobs } from '@db/db-service.js';
@@ -18,25 +19,26 @@ export const AppStore = (Alpine) => {
 
     async init() {
       startBackgroundJobs();
+      const handleResize = () => this.setMobile(window.innerWidth <= 768);
+      window.addEventListener('resize', throttle(handleResize, 250));
+      handleResize();
+      console.log('AppStore initialized');
+    },
 
+    async initPage() {
       const token = localStorage.getItem('sessionToken');
       if (token) {
         const user = await DatabaseService.getCurrentUser();
         if (user) {
           this.currentUser = user;
           const lastPage = await DatabaseService.loadPage(user.id);
-          this.navigateTo(lastPage || PAGES.DASHBOARD, {updateHistory: false});
+          await this.navigateTo(lastPage || PAGES.DASHBOARD, {updateHistory: false});
         } else {
-          this.navigateTo(PAGES.LANDING, {updateHistory: false});
+          await this.navigateTo(PAGES.LANDING, {updateHistory: false});
         }
       } else {
-        this.navigateTo(PAGES.LANDING, {updateHistory: false});
+        await this.navigateTo(PAGES.LANDING, {updateHistory: false});
       }
-
-      const handleResize = () => this.setMobile(window.innerWidth <= 768);
-      window.addEventListener('resize', throttle(handleResize, 250));
-      handleResize();
-      console.log('AppStore initialized');
     },
 
     /* --------------------
@@ -78,20 +80,20 @@ export const AppStore = (Alpine) => {
         }
       } else {
         // persist globally to safePersist localStorage
-        localStorage.setItem('app.currentPage', page);
+        sessionStorage.setItem('app.currentPage', page);
       }
 
       // History management: make URLs stable by using `?page=...` optionally
-      if (updateHistory) {
-        const state = {page};
-        try {
-          if (RESTRICTED_PAGES.includes(page)) history.replaceState(state, '', '');
-          else history.pushState(state, '', `?page=${encodeURIComponent(page)}`);
-        } catch (e) {
-          // Some older browsers or weird environments may throw; ignore
-          console.warn('history pushState failed', e);
-        }
-      }
+      // if (updateHistory) {
+      //   const state = {page};
+      //   try {
+      //     if (RESTRICTED_PAGES.includes(page)) history.replaceState(state, '', '');
+      //     else history.pushState(state, '', `?page=${encodeURIComponent(page)}`);
+      //   } catch (e) {
+      //     // Some older browsers or weird environments may throw; ignore
+      //     console.warn('history pushState failed', e);
+      //   }
+      // }
 
       // set authMode for auth pages
       if (page === PAGES.LOGIN) this.authMode = 'login';
@@ -148,6 +150,7 @@ export const AppStore = (Alpine) => {
 
       await DatabaseService.clearSession({userId: this.currentUser.id});
       localStorage.removeItem('sessionToken');
+      sessionStorage.removeItem('app.currentPage');
 
       if (!keepData) {
         await DatabaseService.clearUserData(this.currentUser.id);
@@ -167,9 +170,12 @@ export const AppStore = (Alpine) => {
        UI helpers / misc
     -------------------- */
     closeModal() {
-      this.showLoginModal = false;
+      document.getElementById('login-modal').classList.add('fade-out');
+      setTimeout(() => {
+        this.showLoginModal = false;
       this.currentPage = this.lastPage ?? this.currentUser ? PAGES.DASHBOARD : PAGES.LANDING;
-      requestAnimationFrame(() => clearById(MODAL_CONTAINER_ID));
+        requestAnimationFrame(() => clearById(MODAL_CONTAINER_ID));
+      }, FADE_DURATION * 1000)
     },
 
     showErrorPage(message = 'Page not found', error = null) {

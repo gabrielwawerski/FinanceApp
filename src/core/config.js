@@ -8,6 +8,11 @@ export const PAGES = Object.freeze({
   TEST: 'test'
 });
 
+// UX constants — ONE SOURCE OF TRUTH
+export const SPLASH_MIN_DURATION = 1200;  // ms
+export const FADE_DURATION = 0.25;        // seconds — used for ALL fades
+export const LOADING_THRESHOLD = 800;    // ms before showing loader
+
 export const MAIN_CONTAINER_ID = 'main-content';
 export const MODAL_CONTAINER_ID = 'modal-content';
 
@@ -16,29 +21,35 @@ export const BASE = import.meta.env.BASE_URL;
 export const ROUTE_CONFIGS = Object.freeze({
 	[PAGES.LOGIN]: {
 		url: `${BASE}views/auth/login.html`,
-		target: `#${MODAL_CONTAINER_ID}`
+		target: `#${MODAL_CONTAINER_ID}`,
+		type: 'modal',
 	},
 	[PAGES.REGISTER]: {
 		url: `${BASE}views/auth/register.html`,
 		target: `#${MODAL_CONTAINER_ID}`,
+		type: 'modal',
 	},
 	[PAGES.DASHBOARD]: {
 		url: `${BASE}views/dashboard/dashboard.html`,
 		target: `#${MAIN_CONTAINER_ID}`,
+		type: 'page',
 	},
 	[PAGES.LANDING]: {
 		url: `${BASE}views/landing.html`,
 		target: `#${MAIN_CONTAINER_ID}`,
+		type: 'page',
 	},
 
   	[PAGES.TEST]: {
 		url: `${BASE}views/test.html`,
 		target: `#${MAIN_CONTAINER_ID}`,
+			type: 'page',
 	},
 
 	error: {
 		url: `${BASE}views/404.html`,
 		target: `#${MAIN_CONTAINER_ID}`,
+		type: 'page',
 	}
 });
 

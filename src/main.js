@@ -1,4 +1,3 @@
-import db from "@db/db.js";
 import htmx from 'htmx.org';
 import Alpine from 'alpinejs';
 import focus from '@alpinejs/focus';
@@ -9,40 +8,47 @@ import { TranslationStore } from "@stores/translation.js";
 import { LoginModal } from "@/modals/login/LoginModal.js";
 import '@components/ThemeToggle.js';
 
-import { BASE, DEFAULT_LOCALE, LS_APP_LANG, PAGES, RESTRICTED_PAGES, TR_KEYS } from "@core/config.js";
+import {
+  BASE,
+  DEFAULT_LOCALE,
+  LS_APP_LANG,
+  TR_KEYS,
+  SPLASH_MIN_DURATION,
+  FADE_DURATION,
+  LOADING_THRESHOLD
+} from "@core/config.js";
+
 import { loadTranslations } from "@util/file-util.js";
 import { startBackgroundJobs } from '@db/db-service.js';
+import { initializeDatabase, seedPredefinedCategories } from "@db/db-util.js";
 
-
+// Expose for templates
 window.TR_KEYS = TR_KEYS;
 
-// ===================== DATABASE =====================
-async function initializeDatabase() {
-  try {
-    await db.open();
-    console.log(`✅ Database opened: ${db.name} v${db.verno}`);
-  } catch (error) {
-    console.error('❌ Failed to open database', error);
-    if (error.name === 'UpgradeError' || error.name === 'VersionError') {
-      await db.delete();
-      await db.open();
-    }
-  }
-}
+// Global flags
+window.fullPageTransition = false;
+let globalLoadingTimeout = null;
 
 // ===================== APP INIT =====================
 document.addEventListener('DOMContentLoaded', async () => {
   const splash = document.getElementById('splash');
   const appContent = document.getElementById('app-content');
-  const MIN_SPLASH = 1000;
   const start = performance.now();
 
+  // Start background processes early
   startBackgroundJobs();
   await initializeDatabase();
+  await seedPredefinedCategories();
 
-  const locale = (localStorage.getItem(LS_APP_LANG) || DEFAULT_LOCALE).replace(/"/g, '');
+  // Resolve user language
+  let locale = localStorage.getItem(LS_APP_LANG)?.replace(/"/g, '') || DEFAULT_LOCALE;
+  const browserLang = (navigator.language || navigator.userLanguage)?.substring(0, 2);
+  if (!['en', 'pl'].includes(locale) && ['en', 'pl'].includes(browserLang)) {
+    locale = browserLang;
+  }
   const translations = await loadTranslations(locale);
 
+  // Register Alpine plugins & data
   Alpine.plugin(focus);
   Alpine.plugin(persist);
   Alpine.plugin(AppStore);
@@ -54,81 +60,130 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   htmx.config.selfRequestsOnly = false;
   htmx.config.defaultSwapStyle = 'innerHTML';
-  window.fullPageTransition = false;
 
-  // ===================== HTMX SWAP ANIMATION =====================
-  document.body.addEventListener('htmx:beforeSwap', (event) => {
+  // ===================== HTMX LOADING & SWAP =====================
+  document.body.addEventListener('htmx:beforeRequest', (event) => {
+    clearTimeout(globalLoadingTimeout);
     const target = event.detail.target;
-    if ((target.id === 'main-content' || target.id === 'modal-content') && target.firstElementChild) {
+
+    if (target.id === 'main-content' && target.firstElementChild) {
       const oldContent = target.firstElementChild;
       oldContent.classList.add('fade-out');
-      if (fullPageTransition) document.getElementById('page-body').classList.add('fade-out');
+
+      if (window.fullPageTransition) {
+        document.getElementById('app-content')?.classList.add('fade-out');
+      }
+
+      // Start timer to show loader if slow
+      globalLoadingTimeout = setTimeout(() => {
+        const loader = document.getElementById('global-loader');
+        if (loader) loader.classList.remove('hidden');
+
+      }, LOADING_THRESHOLD);
+
+    } else if (target.id === 'modal-content') {
+      document.getElementById('modal-bg').style.opacity = 1;
+
+      globalLoadingTimeout = setTimeout(() => {
+        const loader = document.getElementById('global-loader');
+        if (loader) {
+          loader.classList.remove('hidden');
+        }
+
+      }, LOADING_THRESHOLD);
+    }
+  });
+
+  document.body.addEventListener('htmx:beforeSwap', (event) => {
+    clearTimeout(globalLoadingTimeout);
+    const loader = document.getElementById('global-loader');
+
+    const target = event.detail.target;
+    if ((target.id === 'main-content' || target.id === 'modal-content') && target.firstElementChild) {
+
+      if (loader) {
+        setTimeout(() => {
+          loader.classList.add('hidden')
+        }, FADE_DURATION * 1000)
+      }
+
+      // const oldContent = target.firstElementChild;
+      // oldContent.classList.add('fade-out');
+      // if (window.fullPageTransition) {
+      //   document.getElementById('app-content')?.classList.add('fade-out');
+      // }
       event.detail.shouldSwap = false;
 
       setTimeout(() => {
         target.innerHTML = event.detail.xhr.responseText;
         const newContent = target.firstElementChild;
-        newContent.classList.add('fade-in');
-        if (fullPageTransition) {
-          document.getElementById('page-body').classList.remove('fade-out');
-          document.getElementById('page-body').classList.add('fade-in');
+        if (newContent) newContent.classList.add('fade-in');
+        if (window.fullPageTransition) {
+          const pageBody = document.getElementById('app-content');
+          if (pageBody) {
+            pageBody.classList.remove('fade-out');
+            pageBody.classList.add('fade-in');
+          }
         }
-      }, 200);
+      }, FADE_DURATION * 1000);
+    } else if (target.id === 'modal-content') {
+      document.getElementById('modal-bg').style.opacity = 0;
+      if (loader) {
+        setTimeout(() => {
+          loader.classList.add('hidden')
+        }, FADE_DURATION * 1000)
+      }
     }
   });
 
   document.body.addEventListener('htmx:afterSwap', (event) => {
+    const loader = document.getElementById('global-loader');
     const target = event.detail.target;
-    if ((target.id === 'main-content' || target.id === 'modal-content') && target.firstElementChild) {
+
+    if ((target.id === 'modal-content')) {
+      if (loader) {
+        clearTimeout(globalLoadingTimeout);
+        // setTimeout(() => {
+          loader.classList.add('hidden');
+        // }, FADE_DURATION * 1000)
+      }
       const newContent = target.firstElementChild;
       newContent.classList.add('fade-in');
     }
   });
 
+  // Start Alpine
   Alpine.start();
 
-  document.addEventListener('alpine:initialized', async () => {
-    // ===================== SERVICE WORKER =====================
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register(`${BASE}service-worker.js`)
-           .then(reg => console.log('SW registered:', reg.scope))
-           .catch(err => console.error('SW failed:', err));
-      });
-    }
-  })
+  // Finalize app state after Alpine is ready
+  await Alpine.store('app').initPage();
 
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register(`${BASE}service-worker.js`)
+         .then(reg => console.log('SW registered:', reg.scope))
+         .catch(err => console.error('SW registration failed:', err));
+    });
+  }
 
-  // ===================== SPLASH FADE =====================
-  // Ensure minimum splash duration
+  // ===================== SPLASH HIDE =====================
   const elapsed = performance.now() - start;
-  const remaining = Math.max(0, MIN_SPLASH - elapsed);
+  const remaining = Math.max(0, SPLASH_MIN_DURATION - elapsed);
 
   setTimeout(() => {
-    splash.classList.add('opacity-0');   // fade out splash
-    setTimeout(() => {
-          appContent.classList.add('visible'); // fade in app content
-    },300);
+    // Fade out splash
+    splash.classList.add('fade-out');
+    setTimeout(() => splash.remove(), FADE_DURATION * 1000);
 
-    // Remove splash after transition
-    setTimeout(() => splash.remove(), 400);
+    // Reveal app content with fade-in
+    appContent.classList.remove('hidden');
+
+    // Trigger fade-in after repaint
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        appContent.classList.add('fade-in');
+      });
+    });
   }, remaining);
 });
-
-
-// document.addEventListener('alpine:init', () => {
-// window.addEventListener('popstate', (event) => {
-// const state = event.state || {};
-// const app = Alpine.store('app');
-//
-// if (state.page && !RESTRICTED_PAGES.includes(state.page)) {
-//   console.log(`Navigating to page: ${state.page}`);
-//   app.navigateTo(state.page, {updateHistory: false});
-// } else {
-//   console.log('Navigating to fallback page...');
-//   // Optional: if user hits restricted page, redirect to landing/dashboard
-//   const fallback = app.currentUser ? PAGES.DASHBOARD : PAGES.LANDING;
-//   app.navigateTo(fallback, {updateHistory: false});
-// }
-// });
-// });

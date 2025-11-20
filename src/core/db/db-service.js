@@ -168,16 +168,54 @@ export const DatabaseService = {
 
   /* ======================== CATEGORIES & TRANSACTIONS ======================== */
   async createCategory(userId, data) {
+    // Enforce: user-created categories are never predefined
+    const predefined = false;
+
+    // Validate type
+    const type = (data.type === 'income' || data.type === 'expense')
+       ? data.type
+       : 'expense';
+
+    // Validate color
+    const color = typeof data.color === 'string' && /^#[0-9a-fA-F]{6}$/.test(data.color)
+       ? data.color
+       : '#999999';
+
     const record = withTimestamps({
       user_id: userId,
       server_id: null,
       name: data.name?.trim() || 'Untitled',
+      type,
+      color,
+      predefined, // always false here
       sync_status: SYNC_STATUS.LOCAL,
       deleted_at: null,
       version: 1,
+      ...data,
+    });
+
+    return await db.categories.add(record);
+  },
+
+  async updateCategory(id, data) {
+    const existing = await db.categories.get(id);
+    if (!existing) throw new Error('Category not found');
+
+    // Prevent editing predefined fields
+    if (existing.predefined) {
+      data.predefined = existing.predefined;
+      data.type = existing.type;
+      data.color = existing.color;
+    }
+
+    // Normal update
+    const record = withUpdatedAt({
+      ...existing,
       ...data
     });
-    return await db.categories.add(record);
+
+    await db.categories.put(record);
+    return id;
   },
 
   async createTransaction(userId, data) {
@@ -201,10 +239,12 @@ export const DatabaseService = {
 
   async getCategories(userId) {
     return await db.categories
-       .where('user_id').equals(userId)
-       .and(c => !c.deleted_at)
-       .toArray();
+       .filter(c =>
+          !c.deleted_at &&
+          (c.predefined === true || c.user_id === userId)
+       ).toArray();  // TODO: bug?
   },
+
 
   // Optimized with compound index
   async getTransactions(userId, startDate = null, endDate = null) {

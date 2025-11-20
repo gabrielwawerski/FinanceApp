@@ -61,6 +61,12 @@ export function clearById(element) {
   document.getElementById(element).innerHTML = '';
 }
 
+
+// WAIT FOR X
+export async function waitFor(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // htmx-ext-alpine-morph inlined to use in es6 modules
 // htmx.defineExtension('alpine-morph', {
 //   onEvent: function(name, evt) {
