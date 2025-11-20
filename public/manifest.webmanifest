@@ -2,7 +2,7 @@
   "name": "FinanceFlow",
   "description": "Manage your finances the easy way.",
   "short_name": "FinanceFlow",
-  "start_url": "/",
+  "start_url": "/FinanceApp/",
   "display": "standalone",
   "background_color": "#ffffff",
   "lang": "en",
