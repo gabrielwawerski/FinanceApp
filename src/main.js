@@ -15,7 +15,8 @@ import {
   TR_KEYS,
   SPLASH_MIN_DURATION,
   FADE_DURATION,
-  LOADING_THRESHOLD
+  LOADING_THRESHOLD, APP_CONTAINER_ID, MAIN_CONTAINER_ID, MODAL_CONTAINER_ID, GLOBAL_SPINNER_ID, FADE_OUT_CLASS,
+  FADE_IN_CLASS
 } from "@core/config.js";
 
 import { loadTranslations } from "@util/file-util.js";
@@ -29,10 +30,11 @@ window.TR_KEYS = TR_KEYS;
 window.fullPageTransition = false;
 let globalLoadingTimeout = null;
 
+
 // ===================== APP INIT =====================
 document.addEventListener('DOMContentLoaded', async () => {
   const splash = document.getElementById('splash');
-  const appContent = document.getElementById('app-content');
+  const appContent = document.getElementById(APP_CONTAINER_ID);
   const start = performance.now();
 
   // Start background processes early
@@ -62,44 +64,42 @@ document.addEventListener('DOMContentLoaded', async () => {
   htmx.config.defaultSwapStyle = 'innerHTML';
 
   // ===================== HTMX LOADING & SWAP =====================
-  document.body.addEventListener('htmx:beforeRequest', (event) => {
+  document.body.addEventListener('htmx:beforeRequest', async (event) => {
     clearTimeout(globalLoadingTimeout);
     const target = event.detail.target;
 
-    if (target.id === 'main-content' && target.firstElementChild) {
+    if (target.id === MAIN_CONTAINER_ID && target.firstElementChild) {
       const oldContent = target.firstElementChild;
-      oldContent.classList.add('fade-out');
+      oldContent.classList.add(FADE_OUT_CLASS);
 
       if (window.fullPageTransition) {
-        document.getElementById('app-content')?.classList.add('fade-out');
+        document.getElementById(APP_CONTAINER_ID)?.classList.add(FADE_OUT_CLASS);
       }
 
       // Start timer to show loader if slow
       globalLoadingTimeout = setTimeout(() => {
-        const loader = document.getElementById('global-loader');
+        const loader = document.getElementById(GLOBAL_SPINNER_ID);
         if (loader) loader.classList.remove('hidden');
-
       }, LOADING_THRESHOLD);
 
-    } else if (target.id === 'modal-content') {
+    } else if (target.id === MODAL_CONTAINER_ID) {
       document.getElementById('modal-bg').style.opacity = 1;
 
       globalLoadingTimeout = setTimeout(() => {
-        const loader = document.getElementById('global-loader');
+        const loader = document.getElementById(GLOBAL_SPINNER_ID);
         if (loader) {
           loader.classList.remove('hidden');
         }
-
       }, LOADING_THRESHOLD);
     }
   });
 
   document.body.addEventListener('htmx:beforeSwap', (event) => {
     clearTimeout(globalLoadingTimeout);
-    const loader = document.getElementById('global-loader');
+    const loader = document.getElementById(GLOBAL_SPINNER_ID);
 
     const target = event.detail.target;
-    if ((target.id === 'main-content' || target.id === 'modal-content') && target.firstElementChild) {
+    if ((target.id === MAIN_CONTAINER_ID) && target.firstElementChild) {
 
       if (loader) {
         setTimeout(() => {
@@ -107,26 +107,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, FADE_DURATION * 1000)
       }
 
-      // const oldContent = target.firstElementChild;
-      // oldContent.classList.add('fade-out');
-      // if (window.fullPageTransition) {
-      //   document.getElementById('app-content')?.classList.add('fade-out');
-      // }
       event.detail.shouldSwap = false;
 
       setTimeout(() => {
         target.innerHTML = event.detail.xhr.responseText;
         const newContent = target.firstElementChild;
-        if (newContent) newContent.classList.add('fade-in');
+        if (newContent) newContent.classList.add(FADE_IN_CLASS);
         if (window.fullPageTransition) {
-          const pageBody = document.getElementById('app-content');
+          const pageBody = document.getElementById(APP_CONTAINER_ID);
           if (pageBody) {
-            pageBody.classList.remove('fade-out');
-            pageBody.classList.add('fade-in');
+            pageBody.classList.remove(FADE_OUT_CLASS);
+            pageBody.classList.add(FADE_IN_CLASS);
           }
         }
       }, FADE_DURATION * 1000);
-    } else if (target.id === 'modal-content') {
+    } else if (target.id === MODAL_CONTAINER_ID) {
       document.getElementById('modal-bg').style.opacity = 0;
       if (loader) {
         setTimeout(() => {
@@ -137,18 +132,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   document.body.addEventListener('htmx:afterSwap', (event) => {
-    const loader = document.getElementById('global-loader');
+    const loader = document.getElementById(GLOBAL_SPINNER_ID);
     const target = event.detail.target;
 
-    if ((target.id === 'modal-content')) {
+    if ((target.id === MODAL_CONTAINER_ID)) {
       if (loader) {
         clearTimeout(globalLoadingTimeout);
         // setTimeout(() => {
-          loader.classList.add('hidden');
+        loader.classList.add('hidden');
         // }, FADE_DURATION * 1000)
       }
       const newContent = target.firstElementChild;
-      newContent.classList.add('fade-in');
+      newContent.classList.add(FADE_IN_CLASS);
     }
   });
 

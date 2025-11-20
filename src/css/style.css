@@ -126,7 +126,7 @@ body::-webkit-scrollbar {
 }
 
 /* Global loader (hidden by default) */
-#global-loader {
+#global-spinner {
   display: flex; justify-content: center;align-items: center;
   bottom: 0;
   left: 0;
@@ -143,7 +143,7 @@ body::-webkit-scrollbar {
   pointer-events: none;
 }
 
-#global-loader:not(.hidden) {
+#global-spinner:not(.hidden) {
   opacity: 1;
   pointer-events: auto;
 }

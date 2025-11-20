@@ -9,12 +9,17 @@ export const PAGES = Object.freeze({
 });
 
 // UX constants — ONE SOURCE OF TRUTH
-export const SPLASH_MIN_DURATION = 1200;  // ms
+export const SPLASH_MIN_DURATION = 1100;  // ms
 export const FADE_DURATION = 0.25;        // seconds — used for ALL fades
 export const LOADING_THRESHOLD = 800;    // ms before showing loader
 
 export const MAIN_CONTAINER_ID = 'main-content';
 export const MODAL_CONTAINER_ID = 'modal-content';
+export const APP_CONTAINER_ID = 'app-content';
+export const GLOBAL_SPINNER_ID = 'global-spinner';
+
+export const FADE_OUT_CLASS = 'fade-out';
+export const FADE_IN_CLASS = 'fade-in';
 
 export const BASE = import.meta.env.BASE_URL;
 
