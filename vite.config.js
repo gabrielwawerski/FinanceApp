@@ -22,23 +22,11 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
     rollupOptions: {
-      input: {
-        main: 'index.html',
-        sw: 'src/service-worker.js'
-      },
-      output: {
-        entryFileNames: assetInfo => {
-          // Put service worker at the root of dist/
-          if (assetInfo.name === 'service-worker') {
-            return 'service-worker.js';
-          }
-          return 'assets/[name]-[hash].js';
-        }
-      },
+      input: 'index.html'
     }
   },
   server: {
-    port: 3006,
+    port: 3007,
     open: true
   }
 });
