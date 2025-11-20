@@ -25,11 +25,11 @@ import { initializeDatabase, seedPredefinedCategories } from "@db/db-util.js";
 
 // Service Worker
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register(`./service-worker.js`, {type: 'module'})
-       .then(reg => console.log('Service Worker registered:', reg.scope))
-       .catch(err => console.error('Service Worker registration failed:', err));
-  });
+  navigator.serviceWorker.register(`${BASE}service-worker.js`, {
+    type: 'module'
+  })
+     .then(reg => console.log('Service Worker registered:', reg.scope))
+     .catch(err => console.error('Service Worker registration failed:', err));
 }
 
 
