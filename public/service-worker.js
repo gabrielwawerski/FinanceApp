@@ -3,7 +3,7 @@
 // ──────────────────────────────────────────────────────────────
 // 1. CONFIG
 // ──────────────────────────────────────────────────────────────
-const CACHE_NAME = 'finance-manager-v11';  // ← Bump version every deploy!
+const CACHE_NAME = 'finance-manager-v12';  // ← Bump version every deploy!
 
 // Critical assets – these MUST load offline
 const PRECACHE_URLS = [
@@ -22,6 +22,11 @@ const PRECACHE_URLS = [
   `./views/404.html`,
   `./lang/en.json`,
   `./lang/pl.json`,
+
+   // Assets
+   `./images/favicon/web-app-manifest-192x192.png`,
+   `./images/favicon/web-app-manifest-512x512.png`,
+   `./images/favicon/`
 
   // Fallback assets
   `./offline.html`,            // ← You MUST create this!
