@@ -11,7 +11,7 @@ const PRECACHE_URLS = [
   `./index.html`,
   // `./src/main.js`,
   // `./src/css/styles.css`,
-  `./manifest.json`,
+  `./manifest.webmanifest`,
 
   // Core pages (offline-first)
   `./views/landing.html`,

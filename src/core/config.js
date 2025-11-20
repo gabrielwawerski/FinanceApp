@@ -24,38 +24,38 @@ export const FADE_IN_CLASS = 'fade-in';
 export const BASE = import.meta.env.BASE_URL;
 
 export const ROUTE_CONFIGS = Object.freeze({
-	[PAGES.LOGIN]: {
-		url: `${BASE}views/auth/login.html`,
-		target: `#${MODAL_CONTAINER_ID}`,
-		type: 'modal',
-	},
-	[PAGES.REGISTER]: {
-		url: `${BASE}views/auth/register.html`,
-		target: `#${MODAL_CONTAINER_ID}`,
-		type: 'modal',
-	},
-	[PAGES.DASHBOARD]: {
-		url: `${BASE}views/dashboard/dashboard.html`,
-		target: `#${MAIN_CONTAINER_ID}`,
-		type: 'page',
-	},
-	[PAGES.LANDING]: {
-		url: `${BASE}views/landing.html`,
-		target: `#${MAIN_CONTAINER_ID}`,
-		type: 'page',
-	},
+  [PAGES.LOGIN]: {
+    url: `${BASE}views/auth/login.html`,
+    target: `#${MODAL_CONTAINER_ID}`,
+    type: 'modal',
+  },
+  [PAGES.REGISTER]: {
+    url: `${BASE}views/auth/register.html`,
+    target: `#${MODAL_CONTAINER_ID}`,
+    type: 'modal',
+  },
+  [PAGES.DASHBOARD]: {
+    url: `${BASE}views/dashboard/dashboard.html`,
+    target: `#${MAIN_CONTAINER_ID}`,
+    type: 'page',
+  },
+  [PAGES.LANDING]: {
+    url: `${BASE}views/landing.html`,
+    target: `#${MAIN_CONTAINER_ID}`,
+    type: 'page',
+  },
 
-  	[PAGES.TEST]: {
-		url: `${BASE}views/test.html`,
-		target: `#${MAIN_CONTAINER_ID}`,
-			type: 'page',
-	},
+  [PAGES.TEST]: {
+    url: `${BASE}views/test.html`,
+    target: `#${MAIN_CONTAINER_ID}`,
+    type: 'page',
+  },
 
-	error: {
-		url: `${BASE}views/404.html`,
-		target: `#${MAIN_CONTAINER_ID}`,
-		type: 'page',
-	}
+  error: {
+    url: `${BASE}views/404.html`,
+    target: `#${MAIN_CONTAINER_ID}`,
+    type: 'page',
+  }
 });
 
 export const RESTRICTED_PAGES = [PAGES.LOGIN, PAGES.REGISTER, 'error'];
