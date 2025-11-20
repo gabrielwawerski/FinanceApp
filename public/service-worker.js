@@ -23,7 +23,6 @@ const PRECACHE_URLS = [
 
   // Fallback assets
   `./offline.html`,            // ← You MUST create this!
-  `./fallback.css`,            // Optional: minimal styles for offline
 ];
 
 // ──────────────────────────────────────────────────────────────
@@ -114,10 +113,7 @@ self.addEventListener('fetch', event => {
                }
 
                if (path.endsWith('.css')) {
-                 return caches.match(`./fallback.css`) ||
-                    new Response('/* Offline – styles unavailable */', {
-                      headers: {'Content-Type': 'text/css'}
-                    });
+                 return caches.match(request);
                }
 
                if (path.endsWith('.js')) {
