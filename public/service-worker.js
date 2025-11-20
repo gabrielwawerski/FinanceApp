@@ -1,13 +1,9 @@
 // service-worker.js
-import { BASE } from "/src/core/config.js";   // ← Yes! Keep this if BASE is not '/'
 
 // ──────────────────────────────────────────────────────────────
 // 1. CONFIG
 // ──────────────────────────────────────────────────────────────
 const CACHE_NAME = 'finance-manager-v8';  // ← Bump version every deploy!
-
-// Always use BASE for consistency (handles subfolder deploys like /my-app/)
-const base = BASE.endsWith('/') ? BASE : BASE + '/';
 
 // Critical assets – these MUST load offline
 const PRECACHE_URLS = [
@@ -152,7 +148,7 @@ self.addEventListener('push', event => {
       // icon: `${base}icons/icon-192x192.png`,
       // badge: `${base}icons/icon-72x72.png`,
       tag: 'finance-notification',
-      data: { url: data.url || base },
+      data: { url: data.url || "./" },
     })
   );
 });
