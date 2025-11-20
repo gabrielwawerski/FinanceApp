@@ -3,7 +3,7 @@
 // ──────────────────────────────────────────────────────────────
 // 1. CONFIG
 // ──────────────────────────────────────────────────────────────
-const CACHE_NAME = 'finance-manager-v8';  // ← Bump version every deploy!
+const CACHE_NAME = 'finance-manager-v9';  // ← Bump version every deploy!
 
 // Critical assets – these MUST load offline
 const PRECACHE_URLS = [
