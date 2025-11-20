@@ -5,8 +5,8 @@ import persist from '@alpinejs/persist';
 
 import { AppStore } from "@stores/app.js";
 import { TranslationStore } from "@stores/translation.js";
-import { LoginModal } from "@/modals/login/LoginModal.js";
-import '@components/ThemeToggle.js';
+import { LoginModal } from "@/modals/login/login-modal.js";
+import '@components/theme-toggle.js';
 
 import {
   BASE,
