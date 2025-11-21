@@ -1,11 +1,11 @@
 // Define available views as a frozen object for immutability
 export const PAGES = Object.freeze({
-	LANDING: 'landing',
-	LOGIN: 'login',
-	REGISTER: 'register',
-	DASHBOARD: 'dashboard',
-	SETTINGS: 'settings',
-	TEST: 'test',
+  LANDING: 'landing',
+  LOGIN: 'login',
+  REGISTER: 'register',
+  DASHBOARD: 'dashboard',
+  SETTINGS: 'settings',
+  TEST: 'test',
 });
 
 // UX constants — ONE SOURCE OF TRUTH
@@ -24,55 +24,55 @@ export const FADE_IN_CLASS = 'fade-in';
 export const BASE = import.meta.env.BASE_URL;
 
 export const ROUTE_CONFIGS = Object.freeze({
-	[PAGES.LOGIN]: {
-		url: `${BASE}views/auth/login.html`,
-		target: `#${MODAL_CONTAINER_ID}`,
-		type: 'modal',
-	},
+  [PAGES.LOGIN]: {
+    url: `${BASE}views/auth/login.html`,
+	  target: `#${MODAL_CONTAINER_ID}`,
+	  type: 'modal',
+  },
 	[PAGES.REGISTER]: {
-		url: `${BASE}views/auth/register.html`,
-		target: `#${MODAL_CONTAINER_ID}`,
-		type: 'modal',
-	},
+    url: `${BASE}views/auth/register.html`,
+    target: `#${MODAL_CONTAINER_ID}`,
+    type: 'modal',
+  },
 	[PAGES.DASHBOARD]: {
-		url: `${BASE}views/dashboard/dashboard.html`,
-		target: `#${MAIN_CONTAINER_ID}`,
-		type: 'page',
-	},
+    url: `${BASE}views/dashboard/dashboard.html`,
+    target: `#${MAIN_CONTAINER_ID}`,
+    type: 'page',
+  },
 	[PAGES.LANDING]: {
-		url: `${BASE}views/landing.html`,
+    url: `${BASE}views/landing.html`,
 		target: `#${MAIN_CONTAINER_ID}`,
 		type: 'page',
-	},
-
-	[PAGES.TEST]: {
-		url: `${BASE}views/test.html`,
-		target: `#${MAIN_CONTAINER_ID}`,
-		type: 'page',
-	},
-
-	error: {
-		url: `${BASE}views/404.html`,
-		target: `#${MAIN_CONTAINER_ID}`,
-		type: 'page',
-	},
+  },
+  [PAGES.TEST]: {
+    url: `${BASE}views/test.html`,
+	  target: `#${MAIN_CONTAINER_ID}`,
+	  type: 'page',
+  },
+  error: {
+    url: `${BASE}views/404.html`,
+	  target: `#${MAIN_CONTAINER_ID}`,
+	  type: 'page',
+  },
 });
 
 export const RESTRICTED_PAGES = [
-	PAGES.LOGIN, PAGES.REGISTER, 'error',
+  PAGES.LOGIN,
+	PAGES.REGISTER,
+	'error',
 ];
 
 export const TR_KEYS = {
-	LANG_NAME: 'lang_name',
-	LANG_KEY: 'lang_key',
-	APP_NAME: 'app_name',
-	LOGIN: 'login',
-	LOGOUT: 'logout',
-	REGISTER: 'register',
-	SETTINGS: 'settings',
+  LANG_NAME: 'lang_name',
+  LANG_KEY: 'lang_key',
+  APP_NAME: 'app_name',
+  LOGIN: 'login',
+  LOGOUT: 'logout',
+  REGISTER: 'register',
+  SETTINGS: 'settings',
 
-	LANDING_SUBTITLE: 'landing_subtitle',
-	DASHBOARD: 'dashboard',
+  LANDING_SUBTITLE: 'landing_subtitle',
+  DASHBOARD: 'dashboard',
 };
 
 export const DEFAULT_LOCALE = 'en';

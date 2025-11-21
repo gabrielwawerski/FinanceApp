@@ -2,152 +2,159 @@
 <!-- TODO: move to js and remove x-data -->
 <html lang="en" x-data :data-theme="$store.app.isDarkTheme ? 'dark' : 'light'">
 <head>
- <meta charset="UTF-8"/>
- <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
- <title>Finance Manager</title>
- <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
- <link rel="stylesheet" href="/node_modules/bulma/css/bulma.min.css"/>
- <link rel="stylesheet" href="/src/css/style.css"/>
- <script type="module" src="/src/main.js"></script>
- <link rel="manifest" href="/manifest.webmanifest"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Finance Manager</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  <link rel="stylesheet" href="/node_modules/bulma/css/bulma.min.css"/>
+  <link rel="stylesheet" href="/src/css/style.css"/>
+  <script type="module" src="/src/main.js"></script>
+  <link rel="manifest" href="/manifest.webmanifest"/>
 </head>
 <body id="page-body" class="fade-in">
 <!--──────────────────────────────────────────────────────────────────────────────────────
  Global loader (for slow requests)
 ───────────────────────────────────────────────────────────────────────────────────────-->
 <div id="global-spinner"
-		 class="hero has-text-centered hidden"
-		 style="pointer-events: none;">
- <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-	<!-- Outer subtle ring -->
-	<circle cx="60" cy="60" r="50" fill="none" stroke="#ffffff22" stroke-width="3"/>
-	<!-- Animated spinner ring -->
-	<circle cx="60" cy="60" r="50" fill="none" stroke="#4ade80" stroke-width="4"
-					stroke-dasharray="314"
-					stroke-dashoffset="314"
-					stroke-linecap="round"
-					style="
+     class="hero has-text-centered hidden"
+     style="pointer-events: none;">
+  <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <!-- Outer subtle ring -->
+    <circle cx="60" cy="60" r="50" fill="none" stroke="#ffffff22" stroke-width="3"/>
+    <!-- Animated spinner ring -->
+    <circle cx="60" cy="60" r="50" fill="none" stroke="#4ade80" stroke-width="4"
+            stroke-dasharray="314"
+            stroke-dashoffset="314"
+            stroke-linecap="round"
+            style="
             animation: spin 2s linear infinite, dash 1.5s ease-in-out infinite;
             transform-origin: 50% 50%;">
-	</circle>
-	<!-- Simplified professional logo -->
-	<g transform="translate(60,60)" fill="#22c55e">
-	 <text x="0"
-				 y="12"
-				 font-size="36"
-				 font-weight="bold"
-				 text-anchor="middle"
-				 font-family="monospace">$
-	 </text>
-	</g>
- </svg>
+    </circle>
+    <!-- Simplified professional logo -->
+    <g transform="translate(60,60)" fill="#22c55e">
+      <text x="0"
+            y="12"
+            font-size="36"
+            font-weight="bold"
+            text-anchor="middle"
+            font-family="monospace">$
+      </text>
+    </g>
+  </svg>
 </div>
 
 <!--──────────────────────────────────────────────────────────────────────────────────────
  Splash Screen
 ───────────────────────────────────────────────────────────────────────────────────────-->
 <div id="splash" class="hero has-text-centered">
- <div class="gradient-base"></div>
- <div class="gradient-bg"></div>
- <div class="mb-6">
-	<svg width="120"
-			 height="120"
-			 viewBox="0 0 120 120"
-			 xmlns="http://www.w3.org/2000/svg">
-	 <!-- Outer subtle ring -->
-	 <circle cx="60" cy="60" r="50" fill="none" stroke="#ffffff22" stroke-width="3"/>
-	 <!-- Animated spinner ring -->
-	 <circle cx="60" cy="60" r="50" fill="none" stroke="#4ade80" stroke-width="4"
-					 stroke-dasharray="314"
-					 stroke-dashoffset="314"
-					 stroke-linecap="round"
-					 style="animation: spin 2s linear infinite, dash 1.5s ease-in-out infinite; transform-origin: 50% 50%;">
-	 </circle>
-	 <!-- Simplified professional logo -->
-	 <g transform="translate(60,60)" fill="#22c55e">
-		<text x="0"
-					y="12"
-					font-size="36"
-					font-weight="bold"
-					text-anchor="middle"
-					font-family="monospace">$
-		</text>
-	 </g>
-	</svg>
- </div>
+  <div class="gradient-base"></div>
+  <div class="gradient-bg"></div>
+  <div class="mb-6">
+    <svg width="120"
+         height="120"
+         viewBox="0 0 120 120"
+         xmlns="http://www.w3.org/2000/svg">
+      <!-- Outer subtle ring -->
+      <circle cx="60" cy="60" r="50" fill="none" stroke="#ffffff22" stroke-width="3"/>
+      <!-- Animated spinner ring -->
+      <circle cx="60" cy="60" r="50" fill="none" stroke="#4ade80" stroke-width="4"
+              stroke-dasharray="314"
+              stroke-dashoffset="314"
+              stroke-linecap="round"
+              style="animation: spin 2s linear infinite, dash 1.5s ease-in-out infinite;
+					 transform-origin: 50% 50%;">
+      </circle>
+      <!-- Simplified professional logo -->
+      <g transform="translate(60,60)" fill="#22c55e">
+        <text x="0"
+              y="12"
+              font-size="36"
+              font-weight="bold"
+              text-anchor="middle"
+              font-family="monospace">$
+        </text>
+      </g>
+    </svg>
+  </div>
 
- <h1 class="title is-1 has-text-weight-bold"
-		 style="color: #e0f2fe; animation: text-fade-in 1.5s ease-out;">
-	FinanceFlow
- </h1>
- <p class="subtitle is-5" style="color: #c7d2fe; animation: text-fade-in 2s ease-out;">
-	Offline-First &nbsp;•&nbsp; Secure &nbsp;•&nbsp; Yours
- </p>
- <div class="progress is-medium is-success mb-4" style="width: 220px; overflow: hidden;">
-	<div class="progress-bar"
-			 style="width: 70%; animation: loading-bar 3s ease-in-out infinite;"></div>
- </div>
+  <h1 class="title is-1 has-text-weight-bold"
+      style="color: #e0f2fe; animation: text-fade-in 1.5s ease-out;">
+    FinanceFlow
+  </h1>
+  <p class="subtitle is-5" style="color: #c7d2fe; animation: text-fade-in 2s ease-out;">
+    Offline-First &nbsp;•&nbsp; Secure &nbsp;•&nbsp; Yours
+  </p>
+  <div class="progress is-medium is-success mb-4" style="width: 220px; overflow: hidden;">
+    <div class="progress-bar"
+         style="width: 70%; animation: loading-bar 3s ease-in-out infinite;"></div>
+  </div>
 </div>
 
 <div id="modal-bg" class="modal-background-dummy modal-background modal-bg"></div>
 
 <div id="app-content" class="hidden">
- <nav class="navbar is-transparent" x-data="{ open: false }">
-	<div class="container">
-	 <div class="navbar-brand">
-		<a class="navbar-item has-text-weight-semibold"
-			 @click="open = false; $store.app.handleLogoClick()">
-		 <span x-text="$store.app.currentUser ? $store.locale.tr(TR_KEYS.DASHBOARD) : $store.locale.tr(TR_KEYS.APP_NAME)"></span>
-		</a>
-		<a @click="$store.app.navigateTo('test')" class="navbar-item">Test Page</a>
-		<a role="button"
-			 class="navbar-burger"
-			 :class="{ 'is-active': open }"
-			 @click="open = !open">
-		 <span></span><span></span><span></span><span></span>
-		</a>
-	 </div>
-	 <div class="navbar-menu" :class="{ 'is-active': open }">
-		<div class="navbar-start"></div>
-		<div class="navbar-end" style="gap:0.5rem;">
-		 <template x-if="$store.app.currentUser">
-			<theme-toggle></theme-toggle>
-			<a class="navbar-item"
-				 @click="open = false; $store.app.logout()"
-				 title="Logout">
-			 <i class="fas fa-sign-out-alt"></i>
-			</a>
-		 </template>
-		 <template x-if="!$store.app.currentUser">
-			<div class="navbar-item">
-			 <div class="buttons">
-				<span class="are-small">Transition: </span>
-				<button x-data="{ fp: fullPageTransition }"
-								@click="$el.textContent = (fp = !fp) ? 'Page' : 'Content'; fullPageTransition = fp"
-								x-text="fullPageTransition ? 'Page' : 'Content'"
-								class="button is-small"></button>
-				<button @click="$store.app.goToLogin()"
-								x-text="$store.locale.tr(TR_KEYS.LOGIN)"
-								class="button is-primary is-small"></button>
-				<button @click="$store.app.goToDashboard()"
-								x-text="$store.locale.tr(TR_KEYS.REGISTER)"
-								class="button is-primary is-small"></button>
-			 </div>
-			</div>
-		 </template>
-		 <a class="navbar-item has-text-weight-semibold"
-				@click="await $store.locale.set($store.locale.locale === 'pl' ? 'en' : 'pl')"
-				x-text="$store.locale.tr(TR_KEYS.LANG_NAME)"></a>
-		 <a class="navbar-item">
-			<theme-toggle></theme-toggle>
-		 </a>
-		</div>
-	 </div>
-	</div>
- </nav>
+  <nav class="navbar is-transparent" x-data="{ open: false }">
+    <div class="container">
+      <div class="navbar-brand">
+        <a class="navbar-item has-text-weight-semibold"
+           @click="open = false; $store.app.handleLogoClick()">
+		 <span x-text="
+		 $store.app.currentUser ?
+		 $store.locale.tr(TR_KEYS.DASHBOARD)
+		 : $store.locale.tr(TR_KEYS.APP_NAME)"></span>
+        </a>
+        <a @click="$store.app.navigateTo('test')" class="navbar-item">Test Page</a>
+        <a role="button"
+           class="navbar-burger"
+           :class="{ 'is-active': open }"
+           @click="open = !open">
+          <span></span><span></span><span></span><span></span>
+        </a>
+      </div>
+      <div class="navbar-menu" :class="{ 'is-active': open }">
+        <div class="navbar-start"></div>
+        <div class="navbar-end" style="gap:0.5rem;">
+          <template x-if="$store.app.currentUser">
+            <theme-toggle></theme-toggle>
+            <a class="navbar-item"
+               @click="open = false; $store.app.logout()"
+               title="Logout">
+              <i class="fas fa-sign-out-alt"></i>
+            </a>
+          </template>
+          <template x-if="!$store.app.currentUser">
+            <div class="navbar-item">
+              <div class="buttons">
+                <span class="are-small">Transition: </span>
+                <button x-data="{ fp: fullPageTransition }"
+                        @click="
+								$el.textContent = (fp = !fp) ?
+								'Page'
+								: 'Content'; fullPageTransition = fp"
+                        x-text="fullPageTransition ? 'Page' : 'Content'"
+                        class="button is-small"></button>
+                <button @click="$store.app.goToLogin()"
+                        x-text="$store.locale.tr(TR_KEYS.LOGIN)"
+                        class="button is-primary is-small"></button>
+                <button @click="$store.app.goToDashboard()"
+                        x-text="$store.locale.tr(TR_KEYS.REGISTER)"
+                        class="button is-primary is-small"></button>
+              </div>
+            </div>
+          </template>
+          <a class="navbar-item has-text-weight-semibold"
+             @click="await $store.locale.set($store.locale.locale === 'pl' ? 'en' : 'pl')"
+             x-text="$store.locale.tr(TR_KEYS.LANG_NAME)"></a>
+          <a class="navbar-item">
+            <theme-toggle></theme-toggle>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
 
- <div id="main-content"></div>
- <div id="modal-content"></div>
+  <div id="main-content"></div>
+  <div id="modal-content"></div>
 </div>
 </body>
 </html>

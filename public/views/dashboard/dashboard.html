@@ -1,12 +1,12 @@
 <div
-	x-data="{ counter: 0, message: 'Type here without losing content' }"
-	class="notification is-info mt-4">
- <p>Counter: <span x-text="counter"></span></p>
- <button class="button is-small mr-2" @click="counter++">Increment</button>
- <button class="button is-small mr-2" @click="counter = 0">Reset</button>
+    x-data="{ counter: 0, message: 'Type here without losing content' }"
+    class="notification is-info mt-4">
+  <p>Counter: <span x-text="counter"></span></p>
+  <button class="button is-small mr-2" @click="counter++">Increment</button>
+  <button class="button is-small mr-2" @click="counter = 0">Reset</button>
 
- <div class="mt-3">
-	<input type="text" x-model="message" class="input" placeholder="Type something">
-	<p>Message: "<span x-text="message"></span>"</p>
- </div>
+  <div class="mt-3">
+    <input type="text" x-model="message" class="input" placeholder="Type something">
+    <p>Message: "<span x-text="message"></span>"</p>
+  </div>
 </div>

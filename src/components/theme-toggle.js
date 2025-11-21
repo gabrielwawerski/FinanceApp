@@ -1,5 +1,9 @@
 const MOON_ICON_SVG = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+  <svg xmlns="http://www.w3.org/2000/svg"
+  		 width="24"
+  		 height="24"
+  		 fill="none"
+  		 stroke="currentColor"
        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
        style="transform: scale(0.9);">
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
@@ -7,7 +11,11 @@ const MOON_ICON_SVG = `
 `;
 
 const SUN_ICON_SVG = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+  <svg xmlns="http://www.w3.org/2000/svg" 
+  		 width="24" 
+  		 height="24" 
+  		 fill="none" 
+  		 stroke="currentColor"
        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
        style="transform: scale(0.9);">
     <circle cx="12" cy="12" r="5"/>
@@ -24,12 +32,12 @@ const SUN_ICON_SVG = `
 
 
 class ThemeToggle extends HTMLElement {
-	connectedCallback() {
-		this.innerHTML = this.createTemplate();
-	}
+  connectedCallback() {
+    this.innerHTML = this.createTemplate();
+  }
 
-	createTemplate() {
-		return `
+  createTemplate() {
+    return `
       <a class="navbar-item" 
          @click="$store.app.toggleTheme(); open = false;"
          title="Toggle theme" 
@@ -44,7 +52,7 @@ class ThemeToggle extends HTMLElement {
         </template>
       </a>
     `;
-	}
+  }
 }
 
 

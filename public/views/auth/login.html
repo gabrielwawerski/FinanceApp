@@ -1,59 +1,59 @@
 <div x-data="LoginModal()"
-		 x-init="$nextTick(() => {$refs.usernameInput.focus()})"
-		 x-show="$store.app.showLoginModal"
-		 x-trap.noscroll="$store.app.showLoginModal"
-		 :class="{ 'is-active': $store.app.showLoginModal}"
-		 @keydown.escape="closeModal()"
-		 id="login-modal"
-		 class="modal is-active">
+     x-init="$nextTick(() => {$refs.usernameInput.focus()})"
+     x-show="$store.app.showLoginModal"
+     x-trap.noscroll="$store.app.showLoginModal"
+     :class="{ 'is-active': $store.app.showLoginModal}"
+     @keydown.escape="closeModal()"
+     id="login-modal"
+     class="modal is-active">
 
- <div @click="closeModal()"
-			class="modal-background" x-transition.opacity></div>
- <div id="login-modal-body" class="modal-card">
-	<header class="modal-card-head">
-	 <p class="modal-card-title">Login</p>
-	 <button @click="closeModal()"
-					 class="delete"
-					 aria-label="close"></button>
-	</header>
-	<section @click.outside="closeModal()"
-					 class="modal-card-body">
-	 <!-- Login form -->
-	 <form @submit.prevent="">
-		<div class="field">
-		 <label for="login-username-input" class="label">Username</label>
-		 <div class="control">
-			<label>
-			 <input x-ref="usernameInput"
-							x-model="username"
-							id="login-username-input"
-							class="input"
-							type="text"
-							placeholder="Your username"
-							autocomplete="username">
-			</label>
-		 </div>
-		</div>
-		<div class="field">
-		 <label for="login-password-input" class="label">Password</label>
-		 <div class="control">
-			<input id="login-password-input"
-						 class="input"
-						 type="password"
-						 x-model="password"
-						 placeholder="Your password"
-						 autocomplete="current-password">
-		 </div>
-		</div>
-	 </form>
-	</section>
-	<footer class="modal-card-foot">
-	 <button @click="$store.app.login()"
-					 class="button is-success">Login
-	 </button>
-	 <button @click="$store.app.goToRegister()"
-					 class="button">Register instead
-	 </button>
-	</footer>
- </div>
+  <div @click="closeModal()"
+       class="modal-background" x-transition.opacity></div>
+  <div id="login-modal-body" class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Login</p>
+      <button @click="closeModal()"
+              class="delete"
+              aria-label="close"></button>
+    </header>
+    <section @click.outside="closeModal()"
+             class="modal-card-body">
+      <!-- Login form -->
+      <form @submit.prevent="">
+        <div class="field">
+          <label for="login-username-input" class="label">Username</label>
+          <div class="control">
+            <label>
+              <input x-ref="usernameInput"
+                     x-model="username"
+                     id="login-username-input"
+                     class="input"
+                     type="text"
+                     placeholder="Your username"
+                     autocomplete="username">
+            </label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="login-password-input" class="label">Password</label>
+          <div class="control">
+            <input id="login-password-input"
+                   class="input"
+                   type="password"
+                   x-model="password"
+                   placeholder="Your password"
+                   autocomplete="current-password">
+          </div>
+        </div>
+      </form>
+    </section>
+    <footer class="modal-card-foot">
+      <button @click="$store.app.login()"
+              class="button is-success">Login
+      </button>
+      <button @click="$store.app.goToRegister()"
+              class="button">Register instead
+      </button>
+    </footer>
+  </div>
 </div>

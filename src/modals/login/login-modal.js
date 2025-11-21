@@ -5,17 +5,17 @@
  * @returns {Object} Alpine.js component with methods and properties
  */
 export const LoginModal = () => ({
-	username: '',
-	password: '',
+  username: '',
+  password: '',
 
-	/**
-	 * Initialize the component
-	 * @memberof LoginModal
-	 */
-	init() {
-	},
+  /**
+   * Initialize the component
+   * @memberof LoginModal
+   */
+  init() {
+  },
 
-	closeModal() {
-		Alpine.store('app').closeModal();
-	},
+  closeModal() {
+    Alpine.store('app').closeModal();
+  },
 });
