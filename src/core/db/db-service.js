@@ -125,9 +125,13 @@ export const DatabaseService = {
 
   async clearSession({userId = null, token = null} = {}) {
     try {
-      if (userId) await db.session.where('user_id').equals(userId).delete();
-      else if (token) await db.session.where('token').equals(token).delete();
-      else await db.session.clear();
+      if (userId) {
+        await db.session.where('user_id').equals(userId).delete();
+      } else if (token) {
+        await db.session.where('token').equals(token).delete();
+      } else {
+        await db.session.clear();
+      }
 
       const current = localStorage.getItem('sessionToken');
       if (current && (!token || token === current) || (userId && current)) {

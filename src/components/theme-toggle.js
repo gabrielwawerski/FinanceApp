@@ -25,14 +25,13 @@ const SUN_ICON_SVG = `
 
 class ThemeToggle extends HTMLElement {
   connectedCallback() {
-	this.innerHTML = this.createTemplate();
+    this.innerHTML = this.createTemplate();
   }
 
   createTemplate() {
-	return `
+    return `
       <a class="navbar-item" 
          @click="$store.app.toggleTheme(); open = false;"
-         style="background: none"
          title="Toggle theme" 
          aria-label="Toggle theme">
         <!-- Moon -->

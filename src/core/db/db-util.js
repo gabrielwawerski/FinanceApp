@@ -17,30 +17,10 @@ export async function initializeDatabase() {
 export async function seedPredefinedCategories() {
   // Predefined categories list
   const predefined = [
-    {
-      name: 'Salary',
-      type: 'income',
-      color: '#4caf50',
-      predefined: true
-    },
-    {
-      name: 'Groceries',
-      type: 'expense',
-      color: '#ff9800',
-      predefined: true
-    },
-    {
-      name: 'Transport',
-      type: 'expense',
-      color: '#03a9f4',
-      predefined: true
-    },
-    {
-      name: 'Utilities',
-      type: 'expense',
-      color: '#9c27b0',
-      predefined: true
-    }
+    {name: 'Salary', type: 'income', color: '#4caf50', predefined: true},
+    {name: 'Groceries', type: 'expense', color: '#ff9800', predefined: true},
+    {name: 'Transport', type: 'expense', color: '#03a9f4', predefined: true},
+    {name: 'Utilities', type: 'expense', color: '#9c27b0', predefined: true}
   ];
 
   for (const cat of predefined) {

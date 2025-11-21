@@ -45,7 +45,8 @@
   --border: var(--dark-border);
 }
 
-/* Global body */
+
+/* ================= Global Body =================== */
 body {
   background-color: var(--bg);
   color: var(--text);
@@ -56,46 +57,34 @@ body {
   overflow: hidden;
   user-select: none;
 }
-
 html {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
-
-html::-webkit-scrollbar {
-  display: none;
-}
-
+html::-webkit-scrollbar {display: none;}
 /* Optional: also hide on body just in case */
 body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+body::-webkit-scrollbar {display: none;}
 
-body::-webkit-scrollbar {
-  display: none;
-}
 
-/* HTMX Content Fade */
+/* ================ HTMX Content Fade =============== */
 #main-content > *,
 #modal-content > * {
   transition: opacity var(--fade-duration) ease;
 }
-
 .fade-in {
   opacity: 0;
   animation: fadeIn var(--fade-duration) forwards;
 }
-
 .fade-out {
-  opacity: 1;
-  animation: fadeOut var(--fade-duration) forwards;
+  opacity: 1;animation: fadeOut var(--fade-duration) forwards;
 }
-
 @keyframes fadeIn {
   to { opacity: 1; }
 }
-
 @keyframes fadeOut {
   to { opacity: 0; }
 }
@@ -110,25 +99,19 @@ body::-webkit-scrollbar {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: none; /* no background here anymore */
+  background: none;
   opacity: 1;
   transition: opacity var(--fade-duration) ease-out;
   pointer-events: none;
-  overflow: hidden; /* important for the blur edges */
+  overflow: hidden; /* important for blur edges */
 }
-
-/* Solid base — completely hides the page underneath */
-.gradient-base {
+.gradient-base { /* hides the page underneath */
   position: absolute;
   inset: 0;
   z-index: -22;
-  background: #0a5998; /* your exact brand color */
-  /* or use an even darker variant if you prefer */
-  /* background: #051f3d; */
+  background: #0a5998;
 }
-
-/* Blurred animated glow — now sits safely on top of the solid base */
-.gradient-bg {
+.gradient-bg { /* Blurred animated glow — now sits safely on top of the solid base */
   position: absolute;
   inset: -100px;
   z-index: -1;
@@ -145,26 +128,35 @@ body::-webkit-scrollbar {
   animation: gradientShift 16s ease infinite;
   filter: blur(120px);
 }
-
-
 @keyframes gradientShift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
 }
-
-/* Your existing .fade-out and other styles remain unchanged */
-
-#app-content {
-  pointer-events: none;
-  transition: opacity var(--fade-duration) ease;
-  background-color: var(--bg);
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1, 314;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 157, 314;
+    stroke-dashoffset: -78;
+  }
+  100% {
+    stroke-dasharray: 1, 314;
+    stroke-dashoffset: -314;
+  }
+}
+@keyframes text-fade-in { /* Optional: smoother text fade-in */
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-#app-content.fade-in {
-  pointer-events: auto;
-}
 
-/* Global loader (hidden by default) */
+/* ===================== SPINNER ===================== */
 #global-spinner {
   display: flex; justify-content: center;align-items: center;
   bottom: 0;
@@ -181,36 +173,50 @@ body::-webkit-scrollbar {
   transition: opacity var(--fade-duration) ease;
   pointer-events: none;
 }
-
 #global-spinner:not(.hidden) {
   opacity: 1;
   pointer-events: auto;
 }
-
-/* Animations */
-@keyframes dash {
-  to { stroke-dashoffset: 0; }
-}
-
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
-
-@keyframes loading-bar {
-  0%, 100% { width: 30%; }
-  50% { width: 70%; }
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1, 314;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 157, 314;
+    stroke-dashoffset: -78;
+  }
+  100% {
+    stroke-dasharray: 1, 314;
+    stroke-dashoffset: -314;
+  }
 }
-
-@keyframes text-fade-in {
+@keyframes text-fade-in { /* Optional: smoother text fade-in */
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+
+/* ================= MAIN CONTAINERS ================= */
+#app-content {
+  pointer-events: none;
+  transition: opacity var(--fade-duration) ease;
+  background-color: var(--bg);
+}
+#app-content.fade-in {
+  pointer-events: auto;
+}
+
+
+/* ===================== MODALS ===================== */
 .modal-bg {
   backdrop-filter: blur(2px) !important; /* Modern browsers */
   -webkit-backdrop-filter: blur(2px) !important; /* Safari (still needed in 2025) */
 }
-
 .modal-background-dummy {
   position: fixed;
   z-index: 500;
@@ -220,6 +226,14 @@ body::-webkit-scrollbar {
   opacity: 0;
   pointer-events: none;
   background-color: hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-invert-l), 0.86);
-  /* This is the blur */
   transition: opacity var(--fade-duration) ease;
+}
+
+
+/* ===================== NAVBAR ===================== */
+.navbar-item, .navbar-link {
+  padding: 0 .75rem;
+}
+.theme-toggle:hover {
+  background-color: var(--bulma-navbar-item-background-l-delta);
 }
