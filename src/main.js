@@ -26,7 +26,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// auto deploy test
 // Expose for templates
 window.TR_KEYS = TR_KEYS;
 
