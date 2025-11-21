@@ -1,19 +1,19 @@
 <div id="landing-partial" class="hero is-fullheight-with-navbar" x-data>
-  <div class="hero-body">
-    <div class="container has-text-centered">
-      <h1 class="title">FinanceFlow</h1>
-      <p x-text="$store.locale.tr(TR_KEYS.LANDING_SUBTITLE)"
-         class="subtitle"></p>
-      <div class="buttons is-centered">
-        <button @click="$store.app.goToLogin()"
-                x-text="$store.locale.tr(TR_KEYS.LOGIN)"
-                class="button is-primary"
-        ></button>
-        <button @click="$store.app.goToRegister()"
-                x-text="$store.locale.tr(TR_KEYS.REGISTER)"
-                class="button is-light">Register
-        </button>
-      </div>
-    </div>
-  </div>
+ <div class="hero-body">
+	<div class="container has-text-centered">
+	 <h1 class="title">FinanceFlow</h1>
+	 <p x-text="$store.locale.tr(TR_KEYS.LANDING_SUBTITLE)"
+			class="subtitle"></p>
+	 <div class="buttons is-centered">
+		<button @click="$store.app.goToLogin()"
+						x-text="$store.locale.tr(TR_KEYS.LOGIN)"
+						class="button is-primary"
+		></button>
+		<button @click="$store.app.goToRegister()"
+						x-text="$store.locale.tr(TR_KEYS.REGISTER)"
+						class="button is-light">Register
+		</button>
+	 </div>
+	</div>
+ </div>
 </div>

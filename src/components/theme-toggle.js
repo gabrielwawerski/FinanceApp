@@ -24,12 +24,12 @@ const SUN_ICON_SVG = `
 
 
 class ThemeToggle extends HTMLElement {
-  connectedCallback() {
-    this.innerHTML = this.createTemplate();
-  }
+	connectedCallback() {
+		this.innerHTML = this.createTemplate();
+	}
 
-  createTemplate() {
-    return `
+	createTemplate() {
+		return `
       <a class="navbar-item" 
          @click="$store.app.toggleTheme(); open = false;"
          title="Toggle theme" 
@@ -44,7 +44,7 @@ class ThemeToggle extends HTMLElement {
         </template>
       </a>
     `;
-  }
+	}
 }
 
 
