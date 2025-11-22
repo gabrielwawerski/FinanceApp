@@ -320,8 +320,7 @@ export const AppStore = Alpine => {
     // ───────────────────────────────────────────────────────────────────────────────────
     canAccess(page) {
       if (!this.currentUser && AUTH.required.includes(page)) return false;
-      if (this.currentUser && AUTH.restricted.includes(page)) return false;
-      return true;
+      return !(this.currentUser && AUTH.restricted.includes(page));
     },
 
     getPageFromUrl() {
