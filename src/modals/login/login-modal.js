@@ -16,7 +16,7 @@ export const LoginModal = () => ({
    */
   init() {},
 
-  closeModal() {
-    Alpine.store('app').closeModal();
+  closeLoginModal() {
+    Alpine.store('app').closeLoginModal();
   },
 });

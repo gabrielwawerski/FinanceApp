@@ -1,13 +1,15 @@
 import htmx from 'htmx.org';
-import { clearById, safePersist, throttle } from '@util/util.js';
+import { clearById, normalizePath, safePersist, throttle } from '@util/util.js';
 import {
+  AUTH,
   AUTH_LOGIN_EVENT,
   AUTH_LOGOUT_EVENT,
+  BASE,
+  DEBUG,
   FADE_DURATION,
-  MAIN_CONTAINER_ID,
   MODAL_CONTAINER_ID,
   PAGES,
-  ROUTE_CONFIGS,
+  ROUTES,
 } from '@core/config.js';
 import { events } from '@core/events.js';
 import DatabaseService, { startBackgroundJobs } from '@db/db-service.js';
@@ -53,95 +55,122 @@ export const AppStore = Alpine => {
     isMobile: safePersist('app.isMobile', false),
     isDarkTheme: safePersist('app.isDarkTheme', true),
     showLoginModal: false,
+    activeModal: null,
 
     async init() {
       startBackgroundJobs();
       const handleResize = () => this.setMobile(window.innerWidth <= 768);
       window.addEventListener('resize', throttle(handleResize, 250));
       handleResize();
-      console.log('AppStore initialized');
+      if (DEBUG) console.log('AppStore initialized');
     },
 
     async initApp() {
-      const token = localStorage.getItem('sessionToken');
-      if (token) {
-        const user = await DatabaseService.getCurrentUser();
-        if (user) {
-          this.currentUser = user;
-          const lastPage = await DatabaseService.loadPage(user.id);
-          await this.navigateTo(lastPage || PAGES.DASHBOARD, { updateHistory: false });
-        } else {
-          await this.navigateTo(PAGES.LANDING, { updateHistory: false });
-        }
-      } else {
+      // ──────────────────────────────────────────────────────────────
+      // Resolve initial page from URL and render it (replaceState)
+      // ──────────────────────────────────────────────────────────────
+      const requestedPage = this.getPageFromUrl();
+      try {
+        // use replaceState on first load so we don't create a duplicate entry
+        await this.navigateTo(requestedPage, { updateHistory: false });
+      } catch (err) {
+        if (DEBUG) console.warn('initApp: initial navigate failed', err);
+        // fallback to landing if anything goes wrong
         await this.navigateTo(PAGES.LANDING, { updateHistory: false });
+      }
+
+      // ──────────────────────────────────────────────────────────────
+      // Session restore: if we have a token, attempt to rehydrate user
+      // and restore their last saved page. Use replaceState for restore.
+      // ──────────────────────────────────────────────────────────────
+      const token = localStorage.getItem('sessionToken');
+      if (!token) return;
+
+      try {
+        const user = await DatabaseService.getCurrentUser();
+        if (!user) {
+          // token was stale or invalid
+          localStorage.removeItem('sessionToken');
+          return;
+        }
+
+        this.currentUser = user;
+
+        const lastPage = await DatabaseService.loadPage(user.id);
+        const targetPage =
+          lastPage && ROUTES[lastPage] && ROUTES[lastPage].type === 'page'
+            ? lastPage
+            : PAGES.DASHBOARD;
+
+        if (DEBUG)
+          console.log(
+            'initApp: restoring session for user',
+            user.username,
+            '->',
+            targetPage,
+          );
+        // replaceState to avoid inserting an extra history entry on boot
+        await this.navigateTo(targetPage, { updateHistory: false });
+      } catch (err) {
+        if (DEBUG) console.warn('initApp: session restore failed', err);
+        localStorage.removeItem('sessionToken');
       }
     },
 
-    // ───────────────────────────────────────────────────────────────────────────────────
-    // Navigation
-    // ───────────────────────────────────────────────────────────────────────────────────
-    async navigateTo(page, { _updateHistory = true } = {}) {
-      if (this.currentPage === page) {
-        this.lastPage = this.currentPage;
-        return;
-      }
-      const AUTH_REQUIRED_PAGES = [PAGES.DASHBOARD];
-      const AUTH_RESTRICTED_PAGES = [PAGES.LOGIN, PAGES.REGISTER, PAGES.LANDING];
+    // ───────────────────────────────────────────────────────────────
+    // PAGE ROUTER
+    // ───────────────────────────────────────────────────────────────
+    async navigateTo(page, { updateHistory = true } = {}) {
+      const route = ROUTES[page];
 
-      // guards
-      if (AUTH_RESTRICTED_PAGES.includes(page) && this.currentUser) {
-        this.goToDashboard();
-        return;
-      }
-      if (AUTH_REQUIRED_PAGES.includes(page) && !this.currentUser) {
-        console.warn(`Access to ${page} denied: unauthenticated`);
-        return;
+      // Unknown route → landing page
+      if (!route) return this.navigateTo(PAGES.LANDING, { updateHistory });
+
+      if (route.name === this.currentPage) return;
+
+      // If modal, handle separately
+      if (route.type === 'modal') {
+        return this.openModal(page);
       }
 
-      const route = ROUTE_CONFIGS[page];
-      if (!route) {
-        this.showErrorPage('404 - Page not found');
-        return;
+      // Guard access
+      if (!this.canAccess(page)) {
+        return this.navigateTo(PAGES.LANDING, { updateHistory: false });
       }
 
-      this.lastPage = this.currentPage;
-      this.currentPage = page;
+      // Close modal if switching page
+      if (this.activeModal && route.type === 'page') {
+        this.closeModals();
+      }
 
-      // persist page per-user if logged in
-      if (this.currentUser) {
-        try {
-          await DatabaseService.persistPage(this.currentUser.id, page);
-        } catch (e) {
-          console.warn('persistPage failed', e);
+      const targetPath = normalizePath(page);
+      const currentPath = normalizePath(location.pathname);
+
+      if (updateHistory) {
+        if (currentPath !== targetPath) {
+          history.pushState({ page }, '', targetPath);
         }
       } else {
-        // persist globally to safePersist localStorage
+        history.replaceState({ page }, '', targetPath);
+      }
+
+      // Persist or fallback to sessionStorage
+      if (this.currentUser) {
+        await DatabaseService.persistPage(this.currentUser.id, page);
+      } else {
         sessionStorage.setItem('app.currentPage', page);
       }
 
-      // History management: make URLs stable by using `?page=...` optionally
-      // if (updateHistory) {
-      //   const state = {page};
-      //   try {
-      //     if (RESTRICTED_PAGES.includes(page)) history.replaceState(state, '', '');
-      //     else history.pushState(state, '', `?page=${encodeURIComponent(page)}`);
-      //   } catch (e) {
-      //     // Some older browsers or weird environments may throw; ignore
-      //     console.warn('history pushState failed', e);
-      //   }
-      // }
-
-      // set authMode for auth pages
-      if (page === PAGES.LOGIN) this.authMode = 'login';
-      if (page === PAGES.REGISTER) this.authMode = 'register';
-
-      // load via htmx
-      htmx.ajax('GET', route.url, {
+      // Load via HTMX
+      await htmx.ajax('get', route.url, {
         target: route.target,
         swap: 'innerHTML',
         headers: { 'HX-Request': 'true', Accept: 'text/html' },
       });
+
+      // Update store state
+      this.lastPage = this.currentPage;
+      this.currentPage = page;
     },
 
     // ───────────────────────────────────────────────────────────────────────────────────
@@ -149,16 +178,17 @@ export const AppStore = Alpine => {
     // ───────────────────────────────────────────────────────────────────────────────────
     goToLogin() {
       this.showLoginModal = true;
-      this.navigateTo(PAGES.LOGIN);
+      this.navigateTo(PAGES.LOGIN, { updateHistory: false });
     },
-    goToRegister() {
-      this.navigateTo(PAGES.REGISTER);
+
+    goToRegister() {},
+
+    goToLanding(updateHistory = true) {
+      this.navigateTo(PAGES.LANDING, { updateHistory });
     },
-    goToLanding() {
-      this.navigateTo(PAGES.LANDING);
-    },
-    goToDashboard() {
-      this.navigateTo(PAGES.DASHBOARD);
+
+    goToDashboard(updateHistory = true) {
+      this.navigateTo(PAGES.DASHBOARD, { updateHistory });
     },
 
     handleLogoClick() {
@@ -183,7 +213,7 @@ export const AppStore = Alpine => {
       events.emit(AUTH_LOGIN_EVENT, { user });
 
       const lastPage = await DatabaseService.loadPage(user.id);
-      this.navigateTo(lastPage || PAGES.DASHBOARD);
+      await this.navigateTo(lastPage || PAGES.DASHBOARD);
       return true;
     },
 
@@ -213,25 +243,40 @@ export const AppStore = Alpine => {
     },
 
     // ───────────────────────────────────────────────────────────────────────────────────
-    // UI helpers / misc
+    // UI helpers
     // ───────────────────────────────────────────────────────────────────────────────────
-    closeModal() {
-      document.getElementById('login-modal').classList.add('fade-out');
-      setTimeout(() => {
-        this.showLoginModal = false;
-        this.currentPage =
-          (this.lastPage ?? this.currentUser) ? PAGES.DASHBOARD : PAGES.LANDING;
-        requestAnimationFrame(() => clearById(MODAL_CONTAINER_ID));
-      }, FADE_DURATION * 1000);
+    async openModal(page) {
+      const route = ROUTES[page];
+      if (!route || route.type !== 'modal') return;
+
+      // Load modal content
+      await htmx.ajax('get', route.url, {
+        target: route.target,
+        swap: 'innerHTML',
+        headers: { 'HX-Request': 'true', Accept: 'text/html' },
+      });
+
+      this.activeModal = page;
     },
 
-    showErrorPage(message = 'Page not found', error = null) {
-      if (error) console.error('Navigation error:', error);
-      htmx.ajax('GET', '/404.html', {
-        target: MAIN_CONTAINER_ID,
-        swap: 'innerHTML',
-        headers: { 'HX-Request': 'true' },
-      });
+    closeModals() {
+      this.closeLoginModal();
+      this.activeModal = null;
+    },
+
+    closeLoginModal() {
+      const loginModal = document.getElementById('login-modal');
+      if (!loginModal) return;
+
+      loginModal.classList.add('fade-out');
+
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          this.showLoginModal = false;
+          clearById(MODAL_CONTAINER_ID);
+        });
+      }, FADE_DURATION * 1000);
+      this.activeModal = null;
     },
 
     setMobile(value) {
@@ -266,8 +311,40 @@ export const AppStore = Alpine => {
           end,
         );
       } catch (err) {
-        console.error('loadDashboardData error', err);
+        if (DEBUG) console.error('loadDashboardData error', err);
       }
+    },
+
+    // ───────────────────────────────────────────────────────────────────────────────────
+    // Util
+    // ───────────────────────────────────────────────────────────────────────────────────
+    canAccess(page) {
+      if (!this.currentUser && AUTH.required.includes(page)) return false;
+      if (this.currentUser && AUTH.restricted.includes(page)) return false;
+      return true;
+    },
+
+    getPageFromUrl() {
+      const path = normalizePath(location.pathname);
+
+      for (const [pageKey, route] of Object.entries(ROUTES)) {
+        if (route.type !== 'page') continue;
+
+        const full = normalizePath(this._buildFullPath(route.path));
+        if (path === full) return pageKey;
+      }
+      return PAGES.LANDING;
+    },
+
+    _buildFullPath(relativePath) {
+      // Normalizes BASE + relativePath into a single absolute-ish path string.
+      // Examples:
+      //   BASE = '/'        + '/test'  => '/test'
+      //   BASE = '/app/'    + 'test'   => '/app/test'
+      //   BASE = '/app'     + '/'      => '/app'
+      const base = (BASE || '/').replace(/\/+$/, '');
+      const clean = (relativePath || '').replace(/^\/+/, '');
+      return clean ? `${base}/${clean}` : base || '/';
     },
   });
 };

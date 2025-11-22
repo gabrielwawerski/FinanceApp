@@ -1,5 +1,10 @@
 // ───────────────────────────────────────────────────────────────────────────────────────
-// Global constants
+// Config
+// ───────────────────────────────────────────────────────────────────────────────────────
+export const DEBUG = true;
+
+// ───────────────────────────────────────────────────────────────────────────────────────
+// Constants
 // ───────────────────────────────────────────────────────────────────────────────────────
 /* Base URL for the application, read from Vite environment variables */
 export const BASE = import.meta.env.BASE_URL;
@@ -31,44 +36,68 @@ export const PAGES = Object.freeze({
   DASHBOARD: 'dashboard',
   SETTINGS: 'settings',
   TEST: 'test',
+  TEST2: 'test2',
   ERROR: 'error',
 });
 
 /* Routing config for each page. Includes: URL, target container and type (modal/page) */
-export const ROUTE_CONFIGS = Object.freeze({
+export const ROUTES = Object.freeze({
   [PAGES.LOGIN]: {
+    name: PAGES.LOGIN,
     url: `${BASE}views/auth/login.html`,
+    path: null,
     target: `#${MODAL_CONTAINER_ID}`,
     type: 'modal',
   },
   [PAGES.REGISTER]: {
+    name: PAGES.REGISTER,
     url: `${BASE}views/auth/register.html`,
+    path: null,
     target: `#${MODAL_CONTAINER_ID}`,
     type: 'modal',
   },
   [PAGES.DASHBOARD]: {
+    name: PAGES.DASHBOARD,
     url: `${BASE}views/dashboard/dashboard.html`,
+    path: '/dashboard',
     target: `#${MAIN_CONTAINER_ID}`,
     type: 'page',
   },
   [PAGES.LANDING]: {
+    name: PAGES.LANDING,
     url: `${BASE}views/landing.html`,
+    path: '/',
     target: `#${MAIN_CONTAINER_ID}`,
     type: 'page',
   },
   [PAGES.TEST]: {
+    name: PAGES.TEST,
     url: `${BASE}views/test.html`,
+    path: '/test',
+    target: `#${MAIN_CONTAINER_ID}`,
+    type: 'page',
+  },
+  [PAGES.TEST2]: {
+    name: PAGES.TEST2,
+    url: `${BASE}views/test2.html`,
+    path: '/test2',
     target: `#${MAIN_CONTAINER_ID}`,
     type: 'page',
   },
   [PAGES.ERROR]: {
+    name: PAGES.ERROR,
     url: `${BASE}views/404.html`,
+    path: '/404',
     target: `#${MAIN_CONTAINER_ID}`,
     type: 'page',
   },
 });
 
-export const RESTRICTED_PAGES = [PAGES.LOGIN, PAGES.REGISTER, PAGES.DASHBOARD];
+export const AUTH = Object.freeze({
+  required: [PAGES.DASHBOARD, PAGES.SETTINGS],
+  restricted: [PAGES.LOGIN, PAGES.REGISTER, PAGES.LANDING],
+  modals: [PAGES.LOGIN, PAGES.REGISTER, PAGES.SETTINGS],
+});
 
 // ───────────────────────────────────────────────────────────────────────────────────────
 // UX constants

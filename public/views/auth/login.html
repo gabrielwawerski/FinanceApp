@@ -3,20 +3,20 @@
      x-show="$store.app.showLoginModal"
      x-trap.noscroll="$store.app.showLoginModal"
      :class="{ 'is-active': $store.app.showLoginModal}"
-     @keydown.escape="closeModal()"
+     @keydown.escape="closeLoginModal()"
      id="login-modal"
      class="modal is-active">
 
-  <div @click="closeModal()"
+  <div @click="closeLoginModal()"
        class="modal-background" x-transition.opacity></div>
   <div id="login-modal-body" class="modal-card">
     <header class="modal-card-head">
       <p class="modal-card-title">Login</p>
-      <button @click="closeModal()"
+      <button @click="closeLoginModal()"
               class="delete"
               aria-label="close"></button>
     </header>
-    <section @click.outside="closeModal()"
+    <section @click.outside="closeLoginModal()"
              class="modal-card-body">
       <!-- ───────────────────────────────────────────────────────────────────────────────
        Login form

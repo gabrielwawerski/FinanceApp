@@ -79,6 +79,12 @@ export function restartSpinner() {
   });
 }
 
+export function normalizePath(path) {
+  let p = path.replace(/\/\/+/g, '/'); // collapse internal //
+  // p = p.replace(/\/+$/, ''); // trim trailing /
+  return p === '' ? '/' : p;
+}
+
 // htmx-ext-alpine-morph inlined to use in es6 modules
 // htmx.defineExtension('alpine-morph', {
 //   onEvent: function(name, evt) {

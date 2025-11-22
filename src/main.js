@@ -19,6 +19,7 @@ import {
   LS_APP_LANG,
   MAIN_CONTAINER_ID,
   MODAL_CONTAINER_ID,
+  ROUTES,
   SPLASH_MIN_DURATION,
   TR_KEYS,
 } from '@core/config.js';
@@ -29,14 +30,14 @@ import { initializeDatabase, seedPredefinedCategories } from '@db/db-util.js';
 import { restartSpinner } from '@util/util.js';
 
 // Service Worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register(`./service-worker.js`)
-      .then(reg => console.log('Service Worker registered:', reg.scope))
-      .catch(err => console.error('Service Worker registration failed:', err));
-  });
-}
+// if ('serviceWorker' in navigator) {
+//   window.addEventListener('load', () => {
+//     navigator.serviceWorker
+//       .register(`./service-worker.js`)
+//       .then(reg => console.log('Service Worker registered:', reg.scope))
+//       .catch(err => console.error('Service Worker registration failed:', err));
+//   });
+// }
 
 // Expose for templates
 window.TR_KEYS = TR_KEYS;
@@ -164,6 +165,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       const newContent = target.firstElementChild;
       newContent.classList.add(FADE_IN_CLASS);
+    }
+  });
+
+  window.addEventListener('popstate', e => {
+    const page = e.state?.page;
+
+    if (page && ROUTES[page]?.type === 'page') {
+      Alpine.store('app').navigateTo(page, { updateHistory: false });
     }
   });
 

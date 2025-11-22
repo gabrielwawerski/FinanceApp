@@ -106,6 +106,9 @@
 <div id="modal-bg" class="modal-background-dummy modal-background modal-bg"></div>
 
 <div id="app-content" class="hidden">
+  <!-- ───────────────────────────────────────────────────────────────────────────────────
+  Navbar
+  ──────────────────────────────────────────────────────────────────────────────────── -->
   <nav class="navbar is-transparent" x-data="{ open: false }">
     <div class="container">
       <div class="navbar-brand">
@@ -117,6 +120,7 @@
 		 : $store.locale.tr(TR_KEYS.APP_NAME)"></span>
         </a>
         <a @click="$store.app.navigateTo('test')" class="navbar-item">Test Page</a>
+        <a @click="$store.app.navigateTo('test2')" class="navbar-item">Test 2</a>
         <a role="button"
            class="navbar-burger"
            :class="{ 'is-active': open }"

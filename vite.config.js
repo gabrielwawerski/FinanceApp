@@ -3,9 +3,11 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import eslint from 'vite-plugin-eslint';
 
+/** @type {import('vite').UserConfig} */
 export default defineConfig({
   root: '.',
   base: '/FinanceApp/',
+  appType: 'spa',
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
