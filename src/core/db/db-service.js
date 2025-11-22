@@ -1,23 +1,67 @@
-// src/db/db-service.js
 import db from './db.js';
-import { SYNC_STATUS, SESSION_EXPIRY } from './constants.js';
+import { SESSION_EXPIRY, SYNC_STATUS } from './constants.js';
 
-// Helper: UUID fallback
+// ─────────────────────────────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────────────────────────────
 function makeToken() {
-  return crypto.randomUUID?.() || 'local-' + Math.random().toString(36).slice(2) +
-      Date.now().toString(36);
+  return (
+    crypto.randomUUID?.() ||
+    'local-' + Math.random().toString(36).slice(2) + Date.now().toString(36)
+  );
 }
 
 // Timestamps helper
-const withTimestamps = (obj) => ({
-  ...obj, created_at: new Date(), updated_at: new Date(),
+const withTimestamps = obj => ({
+  ...obj,
+  created_at: new Date(),
+  updated_at: new Date(),
 });
-const withUpdatedAt = (obj) => ({ ...obj, updated_at: new Date() });
+const withUpdatedAt = obj => ({ ...obj, updated_at: new Date() });
 
+// ─────────────────────────────────────────────────────────────────────────────────────
+// DatabaseService class
+// ─────────────────────────────────────────────────────────────────────────────────────
+/**
+ * DatabaseService provides a collection of methods for database-related operations such
+ * as user management, session handling, page persistence, and category/transaction
+ * management. It facilitates interaction with a local IndexedDB database and includes
+ * utilities for secure password hashing and session handling.
+ *
+ * Methods:
+ * - `async saveUser(userData, password = null)`: Creates or updates a user record with
+ * optional password hashing.
+ * - `async verifyLogin(usernameOrEmail, password)`: Verifies user credentials using
+ * stored password hash and salt.
+ * - `async getCurrentUser()`: Retrieves the currently logged-in user based on the active
+ * session token.
+ * - `async getUserBySession(token)`: Retrieves a user associated with a given session
+ * token.
+ * - `async createSession(userId, rememberMe = false)`: Creates a session for a user with
+ * an authentication token.
+ * - `async clearSession(options = {})`: Clears session data for a specific user, token,
+ * or all sessions.
+ * - `async cleanupExpiredSessions()`: Cleans up expired sessions from the database and
+ * localStorage.
+ * - `async persistPage(userId, page)`: Persists the last accessed page for a user.
+ * - `async loadPage(userId)`: Retrieves the last accessed page for a user.
+ * - `async createCategory(userId, data)`: Creates a new category for managing user
+ * transactions.
+ * - `async updateCategory(id, data)`: Updates an existing category, with protections for
+ * predefined fields.
+ * - `async createTransaction(userId, data)`: Creates a new user transaction with
+ * validation for required fields.
+ * - `async getCategories(userId)`: Retrieves all non-deleted categories associated with
+ * a
+ * user.
+ *
+ * Note:
+ * - Password hashing uses PBKDF2 with a secure salt, providing a level of cryptographic
+ * security.
+ * - Session handling uses tokens with defined expiry times for authentication.
+ * - The service manages local database enhancements such as timestamping for records.
+ */
 export const DatabaseService = {
-  // ─────────────────────────────────────────────────────────────────────────────────────
-  // UI helpers / misc
-  // ─────────────────────────────────────────────────────────────────────────────────────
   async saveUser(userData, password = null) {
     try {
       let passwordHash = null;
@@ -26,20 +70,29 @@ export const DatabaseService = {
       if (password) {
         const encoder = new TextEncoder();
         const saltBytes = crypto.getRandomValues(new Uint8Array(16));
-        const key = await crypto.subtle.importKey('raw',
-            encoder.encode(password),
-            'PBKDF2',
-            false,
-            ['deriveBits'],
+        const key = await crypto.subtle.importKey(
+          'raw',
+          encoder.encode(password),
+          'PBKDF2',
+          false,
+          ['deriveBits'],
         );
-        const bits = await crypto.subtle.deriveBits({
-          name: 'PBKDF2', salt: saltBytes, iterations: 600000, hash: 'SHA-256',
-        }, key, 256);
-        passwordHash = Array.from(new Uint8Array(bits)).map(b => b.toString(16).
-        padStart(2, '0')).join('');
-        passwordSalt = Array.from(saltBytes).
-        map(b => b.toString(16).padStart(2, '0')).
-        join('');
+        const bits = await crypto.subtle.deriveBits(
+          {
+            name: 'PBKDF2',
+            salt: saltBytes,
+            iterations: 600000,
+            hash: 'SHA-256',
+          },
+          key,
+          256,
+        );
+        passwordHash = Array.from(new Uint8Array(bits))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+        passwordSalt = Array.from(saltBytes)
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
       }
 
       const record = withTimestamps({
@@ -49,7 +102,8 @@ export const DatabaseService = {
         lastName: userData.lastName || '',
         lastPage: userData.lastPage || null,
         passwordHash,
-        passwordSalt, ...userData,
+        passwordSalt,
+        ...userData,
       });
 
       if (userData.id) {
@@ -66,28 +120,42 @@ export const DatabaseService = {
 
   async verifyLogin(usernameOrEmail, password) {
     try {
-      const user = await db.users.where('username').
-      equals(usernameOrEmail).
-      or('email').
-      equals(usernameOrEmail).
-      first();
+      const user = await db.users
+        .where('username')
+        .equals(usernameOrEmail)
+        .or('email')
+        .equals(usernameOrEmail)
+        .first();
 
       if (!user || !user.passwordHash || !user.passwordSalt) return null;
 
       const encoder = new TextEncoder();
-      const saltBytes = Uint8Array.from(user.passwordSalt.match(/.{2}/g).
-      map(b => parseInt(b, 16)));
-      const key = await crypto.subtle.importKey('raw',
-          encoder.encode(password),
-          'PBKDF2',
-          false,
-          ['deriveBits'],
+      const saltBytes = Uint8Array.from(
+        user.passwordSalt.match(/.{2}/g).map(b => parseInt(b, 16)),
       );
-      const bits = await crypto.subtle.deriveBits({
-        name: 'PBKDF2', salt: saltBytes, iterations: 600000, hash: 'SHA-256',
-      }, key, 256);
-      const attemptHash = Array.from(new Uint8Array(bits)).map(b => b.toString(16).
-      padStart(2, '0')).join('');
+
+      const key = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(password),
+        'PBKDF2',
+        false,
+        ['deriveBits'],
+      );
+
+      const bits = await crypto.subtle.deriveBits(
+        {
+          name: 'PBKDF2',
+          salt: saltBytes,
+          iterations: 600000,
+          hash: 'SHA-256',
+        },
+        key,
+        256,
+      );
+
+      const attemptHash = Array.from(new Uint8Array(bits))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
 
       return attemptHash === user.passwordHash ? user : null;
     } catch (err) {
@@ -100,12 +168,14 @@ export const DatabaseService = {
     try {
       const token = localStorage.getItem('sessionToken');
       if (!token) return null;
+
       const session = await db.session.where('token').equals(token).first();
       if (!session || new Date(session.expires_at) < new Date()) {
         if (session) await db.session.delete(session.id);
         localStorage.removeItem('sessionToken');
         return null;
       }
+
       return await db.users.get(session.user_id);
     } catch (err) {
       console.error('getCurrentUser error', err);
@@ -113,13 +183,13 @@ export const DatabaseService = {
     }
   },
 
-  async getUserBySession(token) {
-    // Same logic as above, but reusable
+  async getUserBySession() {
+    // argument: token
     return this.getCurrentUser(); // token is already checked via localStorage
   },
 
   // ─────────────────────────────────────────────────────────────────────────────────────
-  // UI helpers / misc
+  // Session management
   // ─────────────────────────────────────────────────────────────────────────────────────
   async createSession(userId, rememberMe = false) {
     try {
@@ -148,7 +218,7 @@ export const DatabaseService = {
       }
 
       const current = localStorage.getItem('sessionToken');
-      if (current && (!token || token === current) || (userId && current)) {
+      if ((current && (!token || token === current)) || (userId && current)) {
         localStorage.removeItem('sessionToken');
       }
     } catch (err) {
@@ -173,7 +243,7 @@ export const DatabaseService = {
   },
 
   // ─────────────────────────────────────────────────────────────────────────────────────
-  // PAGE PERSISTENCE
+  // Page persistence
   // ─────────────────────────────────────────────────────────────────────────────────────
   async persistPage(userId, page) {
     if (!userId) return;
@@ -187,19 +257,19 @@ export const DatabaseService = {
   },
 
   // ─────────────────────────────────────────────────────────────────────────────────────
-  // CATEGORIES & TRANSACTIONS
+  // Categories and transactions
   // ─────────────────────────────────────────────────────────────────────────────────────
   async createCategory(userId, data) {
     // Enforce: user-created categories are never predefined
     const predefined = false;
 
     // Validate type
-    const type = (data.type === 'income' || data.type === 'expense')
-        ? data.type
-        : 'expense';
+    const type =
+      data.type === 'income' || data.type === 'expense' ? data.type : 'expense';
 
     // Validate color
-    const color = typeof data.color === 'string' && /^#[0-9a-fA-F]{6}$/.test(data.color)
+    const color =
+      typeof data.color === 'string' && /^#[0-9a-fA-F]{6}$/.test(data.color)
         ? data.color
         : '#999999';
 
@@ -212,7 +282,8 @@ export const DatabaseService = {
       predefined, // always false here
       sync_status: SYNC_STATUS.LOCAL,
       deleted_at: null,
-      version: 1, ...data,
+      version: 1,
+      ...data,
     });
 
     return await db.categories.add(record);
@@ -231,7 +302,8 @@ export const DatabaseService = {
 
     // Normal update
     const record = withUpdatedAt({
-      ...existing, ...data,
+      ...existing,
+      ...data,
     });
 
     await db.categories.put(record);
@@ -251,15 +323,16 @@ export const DatabaseService = {
       description: data.description?.trim() || '',
       sync_status: SYNC_STATUS.LOCAL,
       deleted_at: null,
-      version: 1, ...data,
+      version: 1,
+      ...data,
     });
     return await db.transactions.add(record);
   },
 
   async getCategories(userId) {
-    return await db.categories.filter(c => !c.deleted_at &&
-        (c.predefined === true || c.user_id === userId)).
-    toArray();  // TODO: bug?
+    return await db.categories
+      .filter(c => !c.deleted_at && (c.predefined === true || c.user_id === userId))
+      .toArray(); // TODO: bug?
   },
 
   // Optimized with compound index
@@ -269,19 +342,19 @@ export const DatabaseService = {
 
       if (startDate || endDate) {
         const s = startDate ? new Date(startDate.setHours(0, 0, 0, 0)) : new Date(0);
-        const e = endDate ? new Date(endDate.setHours(23, 59, 59, 999)) : new Date(
-            8640000000000000);
+        const e = endDate
+          ? new Date(endDate.setHours(23, 59, 59, 999))
+          : new Date(8640000000000000);
 
         collection = collection.between([userId, s], [userId, e], true, true);
       } else {
         collection = collection.startsWith([userId]);
       }
 
-      const results = await collection.filter(t => !t.deleted_at).
-      reverse() // newest first thanks to index
-      .toArray();
-
-      return results;
+      return await collection
+        .filter(t => !t.deleted_at)
+        .reverse() // newest first thanks to index
+        .toArray();
     } catch (err) {
       console.error('getTransactions error', err);
       return [];
@@ -319,10 +392,13 @@ export const startBackgroundJobs = () => {
 
   DatabaseService.cleanupExpiredSessions(); // immediate run
 
-  cleanupInterval = setInterval(() => {
-    DatabaseService.cleanupExpiredSessions();
-    // Future: SyncService.attemptBackgroundSync();
-  }, 15 * 60 * 1000); // every 15 min
+  cleanupInterval = setInterval(
+    () => {
+      DatabaseService.cleanupExpiredSessions();
+      // Future: SyncService.attemptBackgroundSync();
+    },
+    15 * 60 * 1000,
+  ); // every 15 min
 
   // Also on tab visibility
   document.addEventListener('visibilitychange', () => {

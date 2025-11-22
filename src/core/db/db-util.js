@@ -1,7 +1,6 @@
 import db from '@db/db.js';
 import { SYNC_STATUS } from '@db/constants.js';
 
-
 export async function initializeDatabase() {
   try {
     await db.open();
@@ -24,8 +23,9 @@ export async function seedPredefinedCategories() {
   ];
 
   for (const cat of predefined) {
-    const exists = await db.categories.filter(c => c.name === cat.name && c.predefined).
-    count();
+    const exists = await db.categories
+      .filter(c => c.name === cat.name && c.predefined)
+      .count();
 
     if (!exists) {
       await db.categories.add({

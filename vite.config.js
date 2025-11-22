@@ -1,6 +1,7 @@
+/* eslint-disable no-undef */
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
-
+import eslint from 'vite-plugin-eslint';
 
 export default defineConfig({
   root: '.',
@@ -14,19 +15,20 @@ export default defineConfig({
       '@db': resolve(__dirname, 'src/core/db'),
       '@util': resolve(__dirname, 'src/core/util'),
       '@views': resolve(__dirname, 'src/core/views'),
-      '@css': resolve(__dirname, 'src/css')
-    }
+      '@css': resolve(__dirname, 'src/css'),
+    },
   },
   build: {
     target: 'esnext',
     outDir: 'dist',
     sourcemap: true,
     rollupOptions: {
-      input: 'index.html'
-    }
+      input: 'index.html',
+    },
   },
   server: {
-    port: 3007,
-    open: true
-  }
+    port: 3001,
+    open: true,
+  },
+  plugins: [eslint()],
 });

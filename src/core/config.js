@@ -1,18 +1,17 @@
-// Define available views as a frozen object for immutability
-export const PAGES = Object.freeze({
-  LANDING: 'landing',
-  LOGIN: 'login',
-  REGISTER: 'register',
-  DASHBOARD: 'dashboard',
-  SETTINGS: 'settings',
-  TEST: 'test',
-});
+// ───────────────────────────────────────────────────────────────────────────────────────
+// Global constants
+// ───────────────────────────────────────────────────────────────────────────────────────
+/* Base URL for the application, read from Vite environment variables */
+export const BASE = import.meta.env.BASE_URL;
 
-// UX constants — ONE SOURCE OF TRUTH
-export const SPLASH_MIN_DURATION = 1100;  // ms
-export const FADE_DURATION = 0.2;        // seconds — used for ALL fades
-export const LOADING_THRESHOLD = 800;    // ms before showing loader
+/* Theme that the app will be set to initially */
+export const DEFAULT_THEME = 'dark';
+export const DEFAULT_LOCALE = 'en';
 
+// ───────────────────────────────────────────────────────────────────────────────────────
+// DOM IDs and classes
+// ───────────────────────────────────────────────────────────────────────────────────────
+/* HTML Container where HTMX swaps happen */
 export const MAIN_CONTAINER_ID = 'main-content';
 export const MODAL_CONTAINER_ID = 'modal-content';
 export const APP_CONTAINER_ID = 'app-content';
@@ -21,47 +20,70 @@ export const GLOBAL_SPINNER_ID = 'global-spinner';
 export const FADE_OUT_CLASS = 'fade-out';
 export const FADE_IN_CLASS = 'fade-in';
 
-export const BASE = import.meta.env.BASE_URL;
+// ───────────────────────────────────────────────────────────────────────────────────────
+// Routing
+// ───────────────────────────────────────────────────────────────────────────────────────
+/* Defines all available pages/routes in the application as constant string values */
+export const PAGES = Object.freeze({
+  LANDING: 'landing',
+  LOGIN: 'login',
+  REGISTER: 'register',
+  DASHBOARD: 'dashboard',
+  SETTINGS: 'settings',
+  TEST: 'test',
+  ERROR: 'error',
+});
 
+/* Routing config for each page. Includes: URL, target container and type (modal/page) */
 export const ROUTE_CONFIGS = Object.freeze({
   [PAGES.LOGIN]: {
     url: `${BASE}views/auth/login.html`,
-	  target: `#${MODAL_CONTAINER_ID}`,
-	  type: 'modal',
+    target: `#${MODAL_CONTAINER_ID}`,
+    type: 'modal',
   },
-	[PAGES.REGISTER]: {
+  [PAGES.REGISTER]: {
     url: `${BASE}views/auth/register.html`,
     target: `#${MODAL_CONTAINER_ID}`,
     type: 'modal',
   },
-	[PAGES.DASHBOARD]: {
+  [PAGES.DASHBOARD]: {
     url: `${BASE}views/dashboard/dashboard.html`,
     target: `#${MAIN_CONTAINER_ID}`,
     type: 'page',
   },
-	[PAGES.LANDING]: {
+  [PAGES.LANDING]: {
     url: `${BASE}views/landing.html`,
-		target: `#${MAIN_CONTAINER_ID}`,
-		type: 'page',
+    target: `#${MAIN_CONTAINER_ID}`,
+    type: 'page',
   },
   [PAGES.TEST]: {
     url: `${BASE}views/test.html`,
-	  target: `#${MAIN_CONTAINER_ID}`,
-	  type: 'page',
+    target: `#${MAIN_CONTAINER_ID}`,
+    type: 'page',
   },
-  error: {
+  [PAGES.ERROR]: {
     url: `${BASE}views/404.html`,
-	  target: `#${MAIN_CONTAINER_ID}`,
-	  type: 'page',
+    target: `#${MAIN_CONTAINER_ID}`,
+    type: 'page',
   },
 });
 
-export const RESTRICTED_PAGES = [
-  PAGES.LOGIN,
-	PAGES.REGISTER,
-	'error',
-];
+export const RESTRICTED_PAGES = [PAGES.LOGIN, PAGES.REGISTER, PAGES.DASHBOARD];
 
+// ───────────────────────────────────────────────────────────────────────────────────────
+// UX constants
+// ───────────────────────────────────────────────────────────────────────────────────────
+/* unit: `ms`<p><b>Must</b> be the same as `--fade-duration` in style.css */
+export const SPLASH_MIN_DURATION = 1000;
+/* seconds — used for ALL fades */
+export const FADE_DURATION = 0.2;
+/* unit: `ms`<p>How long to wait with showing loader when waiting for server response. */
+export const LOADING_THRESHOLD = 800;
+
+// ───────────────────────────────────────────────────────────────────────────────────────
+// Translation system
+// ───────────────────────────────────────────────────────────────────────────────────────
+/* Page content translation keys */
 export const TR_KEYS = {
   LANG_NAME: 'lang_name',
   LANG_KEY: 'lang_key',
@@ -75,22 +97,29 @@ export const TR_KEYS = {
   DASHBOARD: 'dashboard',
 };
 
-export const DEFAULT_LOCALE = 'en';
-export const DEFAULT_THEME = 'dark';
-
-export const APP_STORE_NAME = 'app';
-export const TRANSLATION_STORE_NAME = 'locale';
-
+/* Local storage key: `locale.lang`<p>Current application language */
 export const LS_APP_LANG = 'locale.lang';
 
-/* `authToken` */
-export const LS_AUTH_TOKEN = 'authToken';
+// ───────────────────────────────────────────────────────────────────────────────────────
+// Store names
+// ───────────────────────────────────────────────────────────────────────────────────────
+/* Main store name: `app` */
+export const APP_STORE_NAME = 'app';
+/* Translation store name: `locale` */
+export const TRANSLATION_STORE_NAME = 'locale';
 
+// ───────────────────────────────────────────────────────────────────────────────────────
+// General local storage keys
+// ───────────────────────────────────────────────────────────────────────────────────────
+/* Local storage key: `authToken` */
+export const LS_AUTH_TOKEN = 'authToken';
 /* Local storage key `app.currentUser` */
 export const LS_CURRENT_USER = 'app.currentUser';
 
-/* `auth:login` */
+// ───────────────────────────────────────────────────────────────────────────────────────
+// Events for the event system
+// ───────────────────────────────────────────────────────────────────────────────────────
+/* `auth:login` - Event name */
 export const AUTH_LOGIN_EVENT = 'auth:login';
-/* `auth:logout` */
+/* `auth:logout` - Event name */
 export const AUTH_LOGOUT_EVENT = 'auth:logout';
-

@@ -45,10 +45,9 @@
   --border: var(--dark-border);
 }
 
-
-/*────────────────────────────────────────────────────────────────────────────────────────
- GLOBAL BODY
-────────────────────────────────────────────────────────────────────────────────────────*/
+/* ──────────────────────────────────────────────────────────────────────────────────── */
+/* GLOBAL BODY */
+/* ──────────────────────────────────────────────────────────────────────────────────── */
 body {
   background-color: var(--bg);
   color: var(--text);
@@ -58,23 +57,25 @@ body {
   color var(--fade-duration) s;
   overflow: hidden;
   user-select: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 html {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
-html::-webkit-scrollbar {display: none;}
-/* Optional: also hide on body just in case */
-body {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+html::-webkit-scrollbar {
+  display: none;
 }
-body::-webkit-scrollbar {display: none;}
+/* Optional: also hide on body just in case */
 
+body::-webkit-scrollbar {
+  display: none;
+}
 
-/*────────────────────────────────────────────────────────────────────────────────────────
- HTMX Content Fade
-────────────────────────────────────────────────────────────────────────────────────────*/
+/* ──────────────────────────────────────────────────────────────────────────────────── */
+/* HTMX Content Fade */
+/* ──────────────────────────────────────────────────────────────────────────────────── */
 #main-content > *,
 #modal-content > * {
   transition: opacity var(--fade-duration) ease;
@@ -84,19 +85,23 @@ body::-webkit-scrollbar {display: none;}
   animation: fadeIn var(--fade-duration) forwards;
 }
 .fade-out {
-  opacity: 1;animation: fadeOut var(--fade-duration) forwards;
+  opacity: 1;
+  animation: fadeOut var(--fade-duration) forwards;
 }
 @keyframes fadeIn {
-  to { opacity: 1; }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes fadeOut {
-  to { opacity: 0; }
+  to {
+    opacity: 0;
+  }
 }
 
-
-/*────────────────────────────────────────────────────────────────────────────────────────
- SPLASH SCREEN
-────────────────────────────────────────────────────────────────────────────────────────*/
+/* ──────────────────────────────────────────────────────────────────────────────────── */
+/* SPLASH SCREEN */
+/* ──────────────────────────────────────────────────────────────────────────────────── */
 #splash {
   position: fixed;
   inset: 0;
@@ -135,38 +140,21 @@ body::-webkit-scrollbar {display: none;}
   filter: blur(120px);
 }
 @keyframes gradientShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-@keyframes dash {
-  0% {
-    stroke-dasharray: 1, 314;
-    stroke-dashoffset: 0;
+  0%, 100% {
+    background-position: 0 50%;
   }
   50% {
-    stroke-dasharray: 157, 314;
-    stroke-dashoffset: -78;
-  }
-  100% {
-    stroke-dasharray: 1, 314;
-    stroke-dashoffset: -314;
+    background-position: 100% 50%;
   }
 }
-@keyframes text-fade-in { /* Optional: smoother text fade-in */
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 
-
-/*────────────────────────────────────────────────────────────────────────────────────────
- SPINNER
-────────────────────────────────────────────────────────────────────────────────────────*/
+/* ──────────────────────────────────────────────────────────────────────────────────── */
+/* SPINNER */
+/* ──────────────────────────────────────────────────────────────────────────────────── */
 #global-spinner {
-  display: flex; justify-content: center;align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   bottom: 0;
   left: 0;
   position: absolute;
@@ -186,8 +174,12 @@ body::-webkit-scrollbar {display: none;}
   pointer-events: auto;
 }
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 @keyframes dash {
   0% {
@@ -204,14 +196,19 @@ body::-webkit-scrollbar {display: none;}
   }
 }
 @keyframes text-fade-in { /* Optional: smoother text fade-in */
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-
-/*────────────────────────────────────────────────────────────────────────────────────────
- MAIN CONTAINERS
-────────────────────────────────────────────────────────────────────────────────────────*/
+/* ──────────────────────────────────────────────────────────────────────────────────── */
+/* MAIN CONTAINERS */
+/* ──────────────────────────────────────────────────────────────────────────────────── */
 #app-content {
   pointer-events: none;
   transition: opacity var(--fade-duration) ease;
@@ -221,10 +218,9 @@ body::-webkit-scrollbar {display: none;}
   pointer-events: auto;
 }
 
-
-/*────────────────────────────────────────────────────────────────────────────────────────
- MODALS
-───────────────────────────────────────────────────────────────────────────────────────*/
+/* ──────────────────────────────────────────────────────────────────────────────────── */
+/* MODALS */
+/* ──────────────────────────────────────────────────────────────────────────────────── */
 .modal-bg {
   backdrop-filter: blur(2px) !important; /* Modern browsers */
   -webkit-backdrop-filter: blur(2px) !important; /* Safari (still needed in 2025) */
@@ -237,14 +233,16 @@ body::-webkit-scrollbar {display: none;}
   width: 100vw;
   opacity: 0;
   pointer-events: none;
-  background-color: hsla(var(--bulma-scheme-h), var(--bulma-scheme-s), var(--bulma-scheme-invert-l), 0.86);
+  background-color: hsla(var(--bulma-scheme-h),
+  var(--bulma-scheme-s),
+  var(--bulma-scheme-invert-l),
+  0.86);
   transition: opacity var(--fade-duration) ease;
 }
 
-
-/*────────────────────────────────────────────────────────────────────────────────────────
- NAVBAR
-────────────────────────────────────────────────────────────────────────────────────────*/
+/* ──────────────────────────────────────────────────────────────────────────────────── */
+/* NAVBAR */
+/* ──────────────────────────────────────────────────────────────────────────────────── */
 .navbar-item, .navbar-link {
   padding: 0 .75rem;
 }

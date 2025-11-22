@@ -3,16 +3,16 @@ import { loadTranslations } from '@util/file-util.js';
 import { safePersist } from '@util/util.js';
 import { DEFAULT_LOCALE, LS_APP_LANG } from '@core/config.js';
 
-
 export const TranslationStore = (locale = DEFAULT_LOCALE, initialMessages = {}) => {
-  return (Alpine) => {
+  return Alpine => {
     Alpine.store('locale', {
-      locale: safePersist(LS_APP_LANG, locale, DEFAULT_LOCALE), translations: {
+      locale: safePersist(LS_APP_LANG, locale, DEFAULT_LOCALE),
+      translations: {
         [locale]: initialMessages ?? {},
-      }, loaded: { [locale]: true },
-
-      init() {
       },
+      loaded: { [locale]: true },
+
+      init() {},
 
       set(locale) {
         this._load(locale);

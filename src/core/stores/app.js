@@ -1,14 +1,51 @@
 import htmx from 'htmx.org';
 import { clearById, safePersist, throttle } from '@util/util.js';
 import {
-  AUTH_LOGIN_EVENT, AUTH_LOGOUT_EVENT, FADE_DURATION, MAIN_CONTAINER_ID,
-  MODAL_CONTAINER_ID, PAGES, RESTRICTED_PAGES, ROUTE_CONFIGS,
+  AUTH_LOGIN_EVENT,
+  AUTH_LOGOUT_EVENT,
+  FADE_DURATION,
+  MAIN_CONTAINER_ID,
+  MODAL_CONTAINER_ID,
+  PAGES,
+  ROUTE_CONFIGS,
 } from '@core/config.js';
 import { events } from '@core/events.js';
 import DatabaseService, { startBackgroundJobs } from '@db/db-service.js';
 
-
-export const AppStore = (Alpine) => {
+/**
+ * Initializes and manages the global application store using Alpine.js.
+ * The `AppStore` encapsulates application state, user management, theme preferences,
+ * navigation, and various utility methods to streamline app functionality.
+ *
+ * The `AppStore` includes the following key features:
+ *
+ * - **Global State Management**: Stores universal app-level data such as the current
+ *     user, page, device type, and theme preference.
+ * - **Initialization**: Provides `init` and `initApp` methods for setting up essential
+ *     app behaviors, such as detecting screen sizes, retrieving saved pages, and
+ *     handling initial user authentication.
+ * - **Authentication**:
+ *   - Logs in users, verifies credentials, and manages session tokens.
+ *   - Supports logout with options to clear local data for shared devices.
+ * - **Navigation**: Facilitates navigation between pages, ensures authentication
+ *     requirements are met, and updates the UI accordingly.
+ * - **UI Modifications and Utilities**:
+ *   - Supports toggling between light and dark themes.
+ *   - Manages mobile responsiveness based on screen size.
+ *   - Provides utility methods for displaying and hiding modals, handling navigation
+ *     errors, and dynamically loading user-specific data.
+ * - **Data Operations**: Provides wrappers for secure interaction with a backend
+ *     service, such as adding categories, creating transactions, and loading dashboard
+ *     data.
+ *
+ * This store is essential for handling reactive state across the application, ensuring a
+ * consistent user experience, and simplifying the coordination of UI interactions
+ * and backend integrations.
+ *
+ * @param {Object} Alpine - The Alpine.js instance used to register and manage the
+ *                          application store.
+ */
+export const AppStore = Alpine => {
   Alpine.store('app', {
     currentUser: null,
     lastPage: null,
@@ -25,7 +62,7 @@ export const AppStore = (Alpine) => {
       console.log('AppStore initialized');
     },
 
-    async initPage() {
+    async initApp() {
       const token = localStorage.getItem('sessionToken');
       if (token) {
         const user = await DatabaseService.getCurrentUser();
@@ -44,15 +81,13 @@ export const AppStore = (Alpine) => {
     // ───────────────────────────────────────────────────────────────────────────────────
     // Navigation
     // ───────────────────────────────────────────────────────────────────────────────────
-    async navigateTo(page, { updateHistory = true } = {}) {
+    async navigateTo(page, { _updateHistory = true } = {}) {
       if (this.currentPage === page) {
         this.lastPage = this.currentPage;
         return;
       }
       const AUTH_REQUIRED_PAGES = [PAGES.DASHBOARD];
-      const AUTH_RESTRICTED_PAGES = [
-        PAGES.LOGIN, PAGES.REGISTER, PAGES.LANDING,
-      ];
+      const AUTH_RESTRICTED_PAGES = [PAGES.LOGIN, PAGES.REGISTER, PAGES.LANDING];
 
       // guards
       if (AUTH_RESTRICTED_PAGES.includes(page) && this.currentUser) {
@@ -105,7 +140,7 @@ export const AppStore = (Alpine) => {
       htmx.ajax('GET', route.url, {
         target: route.target,
         swap: 'innerHTML',
-        headers: { 'HX-Request': 'true', 'Accept': 'text/html' },
+        headers: { 'HX-Request': 'true', Accept: 'text/html' },
       });
     },
 
@@ -116,12 +151,19 @@ export const AppStore = (Alpine) => {
       this.showLoginModal = true;
       this.navigateTo(PAGES.LOGIN);
     },
-    goToRegister() { this.navigateTo(PAGES.REGISTER); },
-    goToLanding() { this.navigateTo(PAGES.LANDING); },
-    goToDashboard() { this.navigateTo(PAGES.DASHBOARD); },
+    goToRegister() {
+      this.navigateTo(PAGES.REGISTER);
+    },
+    goToLanding() {
+      this.navigateTo(PAGES.LANDING);
+    },
+    goToDashboard() {
+      this.navigateTo(PAGES.DASHBOARD);
+    },
 
     handleLogoClick() {
-      if (this.currentUser) this.goToDashboard(); else this.goToLanding();
+      if (this.currentUser) this.goToDashboard();
+      else this.goToLanding();
     },
 
     // ───────────────────────────────────────────────────────────────────────────────────
@@ -177,9 +219,8 @@ export const AppStore = (Alpine) => {
       document.getElementById('login-modal').classList.add('fade-out');
       setTimeout(() => {
         this.showLoginModal = false;
-        this.currentPage = this.lastPage ?? this.currentUser
-            ? PAGES.DASHBOARD
-            : PAGES.LANDING;
+        this.currentPage =
+          (this.lastPage ?? this.currentUser) ? PAGES.DASHBOARD : PAGES.LANDING;
         requestAnimationFrame(() => clearById(MODAL_CONTAINER_ID));
       }, FADE_DURATION * 1000);
     },
@@ -187,12 +228,18 @@ export const AppStore = (Alpine) => {
     showErrorPage(message = 'Page not found', error = null) {
       if (error) console.error('Navigation error:', error);
       htmx.ajax('GET', '/404.html', {
-        target: MAIN_CONTAINER_ID, swap: 'innerHTML', headers: { 'HX-Request': 'true' },
+        target: MAIN_CONTAINER_ID,
+        swap: 'innerHTML',
+        headers: { 'HX-Request': 'true' },
       });
     },
 
-    setMobile(value) { this.isMobile = value; },
-    toggleTheme() { this.isDarkTheme = !this.isDarkTheme; },
+    setMobile(value) {
+      this.isMobile = value;
+    },
+    toggleTheme() {
+      this.isDarkTheme = !this.isDarkTheme;
+    },
 
     /* Convenience wrappers for data operations */
     async addCategory(data) {
@@ -213,9 +260,10 @@ export const AppStore = (Alpine) => {
         start.setDate(end.getDate() - daysBack);
 
         this.categories = await DatabaseService.getCategories(this.currentUser.id);
-        this.transactions = await DatabaseService.getTransactions(this.currentUser.id,
-            start,
-            end,
+        this.transactions = await DatabaseService.getTransactions(
+          this.currentUser.id,
+          start,
+          end,
         );
       } catch (err) {
         console.error('loadDashboardData error', err);

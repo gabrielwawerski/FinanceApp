@@ -9,28 +9,39 @@ import { LoginModal } from '@/modals/login/login-modal.js';
 import '@components/theme-toggle.js';
 
 import {
-  DEFAULT_LOCALE, LS_APP_LANG, TR_KEYS, SPLASH_MIN_DURATION, FADE_DURATION,
-  LOADING_THRESHOLD, APP_CONTAINER_ID, MAIN_CONTAINER_ID, MODAL_CONTAINER_ID,
-  GLOBAL_SPINNER_ID, FADE_OUT_CLASS, FADE_IN_CLASS,
+  APP_CONTAINER_ID,
+  DEFAULT_LOCALE,
+  FADE_DURATION,
+  FADE_IN_CLASS,
+  FADE_OUT_CLASS,
+  GLOBAL_SPINNER_ID,
+  LOADING_THRESHOLD,
+  LS_APP_LANG,
+  MAIN_CONTAINER_ID,
+  MODAL_CONTAINER_ID,
+  SPLASH_MIN_DURATION,
+  TR_KEYS,
 } from '@core/config.js';
 
 import { loadTranslations } from '@util/file-util.js';
 import { startBackgroundJobs } from '@db/db-service.js';
 import { initializeDatabase, seedPredefinedCategories } from '@db/db-util.js';
+import { restartSpinner } from '@util/util.js';
 
 // Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register(`./service-worker.js`).
-    then(reg => console.log('Service Worker registered:', reg.scope)).
-    catch(err => console.error('Service Worker registration failed:', err));
+    navigator.serviceWorker
+      .register(`./service-worker.js`)
+      .then(reg => console.log('Service Worker registered:', reg.scope))
+      .catch(err => console.error('Service Worker registration failed:', err));
   });
 }
 
 // Expose for templates
 window.TR_KEYS = TR_KEYS;
 
-// Global flags
+// Global full page transition flag
 window.fullPageTransition = false;
 let globalLoadingTimeout = null;
 
@@ -71,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ─────────────────────────────────────────────────────────────────────────────────────
   // HTMX LOADING & SWAP
   // ─────────────────────────────────────────────────────────────────────────────────────
-  document.body.addEventListener('htmx:beforeRequest', async (event) => {
+  document.body.addEventListener('htmx:beforeRequest', async event => {
     clearTimeout(globalLoadingTimeout);
     const target = event.detail.target;
 
@@ -86,9 +97,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Start timer to show loader if slow
       globalLoadingTimeout = setTimeout(() => {
         const loader = document.getElementById(GLOBAL_SPINNER_ID);
-        if (loader) loader.classList.remove('hidden');
+        if (loader) {
+          loader.classList.remove('hidden');
+          restartSpinner();
+        }
       }, LOADING_THRESHOLD);
-
     } else if (target.id === MODAL_CONTAINER_ID) {
       document.getElementById('modal-bg').style.opacity = 1;
 
@@ -96,18 +109,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const loader = document.getElementById(GLOBAL_SPINNER_ID);
         if (loader) {
           loader.classList.remove('hidden');
+          restartSpinner();
         }
       }, LOADING_THRESHOLD);
     }
   });
 
-  document.body.addEventListener('htmx:beforeSwap', (event) => {
+  document.body.addEventListener('htmx:beforeSwap', event => {
     clearTimeout(globalLoadingTimeout);
     const loader = document.getElementById(GLOBAL_SPINNER_ID);
 
     const target = event.detail.target;
-    if ((target.id === MAIN_CONTAINER_ID) && target.firstElementChild) {
-
+    if (target.id === MAIN_CONTAINER_ID && target.firstElementChild) {
       if (loader) {
         setTimeout(() => {
           loader.classList.add('hidden');
@@ -138,11 +151,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  document.body.addEventListener('htmx:afterSwap', (event) => {
+  document.body.addEventListener('htmx:afterSwap', event => {
     const loader = document.getElementById(GLOBAL_SPINNER_ID);
     const target = event.detail.target;
 
-    if ((target.id === MODAL_CONTAINER_ID)) {
+    if (target.id === MODAL_CONTAINER_ID) {
       if (loader) {
         clearTimeout(globalLoadingTimeout);
         // setTimeout(() => {
@@ -158,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   Alpine.start();
 
   // Finalize app state after Alpine is ready
-  await Alpine.store('app').initPage();
+  await Alpine.store('app').initApp();
 
   // ─────────────────────────────────────────────────────────────────────────────────────
   // SPLASH HIDE

@@ -18,7 +18,9 @@
     </header>
     <section @click.outside="closeModal()"
              class="modal-card-body">
-      <!-- Login form -->
+      <!-- ───────────────────────────────────────────────────────────────────────────────
+       Login form
+      ──────────────────────────────────────────────────────────────────────────────── -->
       <form @submit.prevent="">
         <div class="field">
           <label for="login-username-input" class="label">Username</label>
@@ -46,6 +48,7 @@
           </div>
         </div>
       </form>
+
     </section>
     <footer class="modal-card-foot">
       <button @click="$store.app.login()"

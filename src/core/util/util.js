@@ -1,6 +1,5 @@
 import Alpine from 'alpinejs';
 
-
 /**
  * Persist data to `localStorage` with fallback handling
  * @param {string} key - localStorage key
@@ -32,15 +31,16 @@ export function safePersist(key, value, defaultValue = value) {
       return Alpine.$persist(parsed).as(key);
     } catch (parseError) {
       // Invalid JSON - use default value
-      console.warn(`Invalid JSON in localStorage for key "${key}", 
+      console.warn(`Invalid JSON in localStorage for key "${key}",
 				using default value: ${defaultValue}`);
       localStorage.removeItem(key);
       return Alpine.$persist(defaultValue).as(key);
     }
   } catch (error) {
     // Any other error - use default value
-    console.warn(`Error accessing localStorage for key "${key}", using default value:`,
-        error,
+    console.warn(
+      `Error accessing localStorage for key "${key}", using default value:`,
+      error,
     );
     localStorage.removeItem(key);
     return Alpine.$persist(defaultValue).as(key);
@@ -54,7 +54,7 @@ export function throttle(fn, limit) {
       fn.apply(this, args);
       waiting = true;
       console.log('throttle ran');
-      setTimeout(() => waiting = false, limit);
+      setTimeout(() => (waiting = false), limit);
     }
   };
 }
@@ -66,6 +66,17 @@ export function clearById(element) {
 // WAIT FOR X
 export async function waitFor(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function restartSpinner() {
+  const ring = document.querySelector('.spinner-ring');
+  if (!ring) return;
+
+  ring.style.animation = 'none';
+  requestAnimationFrame(() => {
+    ring.style.animation =
+      'spin 5s linear infinite, dash 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite';
+  });
 }
 
 // htmx-ext-alpine-morph inlined to use in es6 modules

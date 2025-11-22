@@ -1,3 +1,5 @@
+import Alpine from 'alpinejs';
+
 /**
  * Login modal Alpine.js component
  * @namespace LoginModal
@@ -12,8 +14,7 @@ export const LoginModal = () => ({
    * Initialize the component
    * @memberof LoginModal
    */
-  init() {
-  },
+  init() {},
 
   closeModal() {
     Alpine.store('app').closeModal();

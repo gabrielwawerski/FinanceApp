@@ -30,7 +30,6 @@ const SUN_ICON_SVG = `
   </svg>
 `;
 
-
 class ThemeToggle extends HTMLElement {
   connectedCallback() {
     this.innerHTML = this.createTemplate();
@@ -42,11 +41,9 @@ class ThemeToggle extends HTMLElement {
          @click="$store.app.toggleTheme(); open = false;"
          title="Toggle theme" 
          aria-label="Toggle theme">
-        <!-- Moon -->
         <template x-if="!$store.app.isDarkTheme">
           ${MOON_ICON_SVG}
         </template>
-        <!-- Sun -->
         <template x-if="$store.app.isDarkTheme">
           ${SUN_ICON_SVG}
         </template>
@@ -54,6 +51,5 @@ class ThemeToggle extends HTMLElement {
     `;
   }
 }
-
 
 customElements.define('theme-toggle', ThemeToggle);

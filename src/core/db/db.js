@@ -1,7 +1,5 @@
-// src/db/db.js
 import Dexie from 'dexie';
-import { SYNC_STATUS, INDEX_NAMES } from './constants.js';
-
+import { INDEX_NAMES } from './constants.js';
 
 export const db = new Dexie('finance_manager');
 
@@ -57,4 +55,5 @@ db.version(1).stores({
 		${INDEX_NAMES.TRANSACTIONS_BY_USER_DATE}
 	`.replace(/\s+/g, ''),
 });
+
 export default db;
